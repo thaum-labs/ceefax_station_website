@@ -2307,7 +2307,7 @@ _N_E = (window.webpackJsonp_N_E = window.webpackJsonp_N_E || []).push([
                             lineNumber: 38,
                             columnNumber: 29
                         }
-                    }, "all our salesforce professionals are ex end users with consultancy experiance and have delivered many past projects, we are UK based and available to contact Monday - Friday and available for projects and meetings during the hours that you define"),
+                    }, "all our salesforce professionals are ex end users with consultancy experiance and have delivered many past projects, we are UK based and available to contact Monday - Friday and available for projects and meetings during the hours that you define."),
                     __self: this,
                     __source: {
                         fileName: ae,
