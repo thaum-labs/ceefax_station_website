@@ -1647,8 +1647,8 @@ _N_E = (window.webpackJsonp_N_E = window.webpackJsonp_N_E || []).push([
                     },
                     children: U(B, {
                         className: u ? "visible" : null,
-                        text: "\u201cthaum provides us with 1 day a week of time, they are like a member of the team that we can contact any time and deliver quickly!.\u201d",
-                        name: "Harry Platts",
+                        text: "\u201cthaum provides us with 1 day a week of time, they are like a member of the team that we can contact any time and deliver quickly!\u201d",
+                        name: "Celia Wang",
                         role: "Operations Manager",
                         image: "../../../people2.png",
                         enterprise: "../../../enterprise2.png",
@@ -1673,9 +1673,9 @@ _N_E = (window.webpackJsonp_N_E = window.webpackJsonp_N_E || []).push([
                     },
                     children: U(B, {
                         className: f ? "visible" : null,
-                        text: "\u201cWe\u2019ve had the same contact everytime and they know our business and its people - its a personal touch and an attention to detail other services just don't provide.\u201d",
-                        name: "Tim Franklin",
-                        role: "Project Delivery Manager",
+                        text: "\u201cthey know our business and its people, thaum bring a personal touch and attention to detail other services just don't provide.\u201d",
+                        name: "Sara Mvula",
+                        role: "project manager",
                         image: "../../../people3.png",
                         enterprise: "../../../enterprise3.png",
                         shape: "../../../middle.png",
