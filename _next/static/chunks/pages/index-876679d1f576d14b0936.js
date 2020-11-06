@@ -1425,7 +1425,7 @@ _N_E = (window.webpackJsonp_N_E = window.webpackJsonp_N_E || []).push([
                     },
                     children: W(A, {
                         className: l ? "visible" : null,
-                        text: "THAUM provides us with 1 day a week of time, they are like a member of the team that we can contact any time and deliver quickly - if we have a big project we can always add days as we need which helps keep costs down for us.",
+                        text: "\u201cthaum provides us with 1 day a week of time, they are like a member of the team that we can contact any time and deliver quickly - if we have a big project we can always add days as we need which helps keep costs down for us.\u201d",
                         name: "Harry Platts",
                         role: "Operations Manager",
                         image: "../../../people2.png",
