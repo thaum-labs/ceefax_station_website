@@ -981,7 +981,7 @@ _N_E = (window.webpackJsonp_N_E = window.webpackJsonp_N_E || []).push([
                                     lineNumber: 49,
                                     columnNumber: 29
                                 }
-                            }, "Take a look at how THAUM compares with hiring an on-site team vs consultancies vs contractors."))), k(D.CSSTransitionGroup, {
+                            }, "Take a look at how thaum compares with hiring an on-site team vs consultancies vs contractors."))), k(D.CSSTransitionGroup, {
                                 transitionName: "text_animation_form",
                                 transitionAppear: !0,
                                 transitionAppearTimeout: 1500,
