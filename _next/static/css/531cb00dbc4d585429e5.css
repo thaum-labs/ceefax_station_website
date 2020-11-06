@@ -1913,25 +1913,25 @@ body button .loader:after {
     }
 }
 
-body button.secundary {
+body button.secondary {
     background: none;
     border: 2px solid #077bee;
     color: #077bee
 }
 
-body button.secundary:active {
+body button.secondary:active {
     background: #2d53ec;
     color: #fff
 }
 
 @media(hover:hover)and (pointer:fine) {
-    body button.secundary:hover {
+    body button.secondary:hover {
         background: #077bee;
         color: #fff
     }
 }
 
-body button.secundary:disabled {
+body button.secondary:disabled {
     background: #f7f6f6;
     border: 2px solid #dcdcdc;
     color: #949494

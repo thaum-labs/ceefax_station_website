@@ -1771,7 +1771,7 @@ _N_E = (window.webpackJsonp_N_E = window.webpackJsonp_N_E || []).push([
                                     columnNumber: 25
                                 }
                             }, this.state.description)), X("button", {
-                                className: "secundary",
+                                className: "secondary",
                                 onClick: function(e) {
                                     e.preventDefault(), $("html,body").animate({
                                         scrollTop: $("#footer").offset().top
