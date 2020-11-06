@@ -1675,7 +1675,7 @@ _N_E = (window.webpackJsonp_N_E = window.webpackJsonp_N_E || []).push([
                         className: f ? "visible" : null,
                         text: "\u201cthey know our business and its people, thaum bring a personal touch and attention to detail other services just don't provide.\u201d",
                         name: "Sara Mvula",
-                        role: "project manager",
+                        role: "Project Manager",
                         image: "../../../people3.png",
                         enterprise: "../../../enterprise3.png",
                         shape: "../../../middle.png",
