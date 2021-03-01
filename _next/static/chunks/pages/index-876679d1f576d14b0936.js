@@ -2174,7 +2174,7 @@ _N_E = (window.webpackJsonp_N_E = window.webpackJsonp_N_E || []).push([
                             lineNumber: 28,
                             columnNumber: 29
                         }
-                    }, "place a salesforce specialist in your team without the financial burden and outlays that typically brings - we have experiance across sectors as end users and as consultants plus are UK based."),
+                    }, "place a salesforce specialist in your team without the financial burden and outlays that typically brings - we have experience across sectors as end users and as consultants plus are UK based."),
                     __self: this,
                     __source: {
                         fileName: ie,
@@ -2307,7 +2307,7 @@ _N_E = (window.webpackJsonp_N_E = window.webpackJsonp_N_E || []).push([
                             lineNumber: 38,
                             columnNumber: 29
                         }
-                    }, "all our salesforce professionals are ex end users with consultancy experiance and have delivered many past projects, we are UK based and available to contact Monday - Friday and available for projects and meetings during the hours that you define."),
+                    }, "all our salesforce professionals are ex end users with consultancy experience and have delivered many past projects, we are UK based and available to contact Monday - Friday and available for projects and meetings during the hours that you define."),
                     __self: this,
                     __source: {
                         fileName: ae,
@@ -2664,7 +2664,7 @@ _N_E = (window.webpackJsonp_N_E = window.webpackJsonp_N_E || []).push([
                     }
                 }, "thaum"), be("meta", {
                     name: "description",
-                    content: "Have your own salesforce team without it costing the earth. place a salesforce specialist in your team without the financial burden and outlays that typically brings - we have experiance across sectors as end users and as consultants plus are UK based.",
+                    content: "Have your own salesforce team without it costing the earth. place a salesforce specialist in your team without the financial burden and outlays that typically brings - we have experience across sectors as end users and as consultants plus are UK based.",
                     __self: this,
                     __source: {
                         fileName: _e,
