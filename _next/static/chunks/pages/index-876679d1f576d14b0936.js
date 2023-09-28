@@ -2479,8 +2479,8 @@ _N_E = (window.webpackJsonp_N_E = window.webpackJsonp_N_E || []).push([
                                 }
                             }, me(O, {
                                 key: "1",
-                                placeholder: "Your first name",
-                                label: "First name",
+                                placeholder: "first name",
+                                label: "first name",
                                 typeInput: "text",
                                 form: "form_contact_us",
                                 ref: this.child2,
@@ -2493,8 +2493,8 @@ _N_E = (window.webpackJsonp_N_E = window.webpackJsonp_N_E || []).push([
                                 }
                             }), me(O, {
                                 key: "2",
-                                placeholder: "Your last name",
-                                label: "Last name",
+                                placeholder: "last name",
+                                label: "last name",
                                 typeInput: "text",
                                 form: "form_contact_us",
                                 ref: this.child3,
@@ -2507,8 +2507,8 @@ _N_E = (window.webpackJsonp_N_E = window.webpackJsonp_N_E || []).push([
                                 }
                             }), me(O, {
                                 key: "3",
-                                placeholder: "Your email",
-                                label: "Email address",
+                                placeholder: "email",
+                                label: "email address",
                                 typeInput: "email",
                                 form: "form_contact_us",
                                 ref: this.child4,
