@@ -1378,7 +1378,7 @@ _N_E = (window.webpackJsonp_N_E = window.webpackJsonp_N_E || []).push([
                             lineNumber: 24,
                             columnNumber: 25
                         }
-                    }, "Trusted by Business"),
+                    }, "Our Partners"),
                     __self: this,
                     __source: {
                         fileName: I,
@@ -2174,7 +2174,7 @@ _N_E = (window.webpackJsonp_N_E = window.webpackJsonp_N_E || []).push([
                             lineNumber: 28,
                             columnNumber: 29
                         }
-                    }, "place a salesforce specialist in your team without the financial burden and outlays that typically brings - we have experience across sectors as end users and as consultants plus are UK based."),
+                    }, "place a salesforce specialist in your team without the financial burden and outlays that typically brings - we have experience across multiple sectors as end users and as consultants and we are UK based."),
                     __self: this,
                     __source: {
                         fileName: ie,
@@ -2307,7 +2307,7 @@ _N_E = (window.webpackJsonp_N_E = window.webpackJsonp_N_E || []).push([
                             lineNumber: 38,
                             columnNumber: 29
                         }
-                    }, "all our salesforce professionals are ex end users with consultancy experience and have delivered many past projects, we are UK based and available to contact Monday - Friday and available for projects and meetings during the hours that you define."),
+                    }, "all our salesforce professionals are ex end users with consultancy experience and have delivered multiple prior projects, we help you understand the capabilities of Salesforce and how you can get the most out of your system through automation of repetitive tasks and understanding of data and reports."),
                     __self: this,
                     __source: {
                         fileName: ae,
@@ -2609,7 +2609,7 @@ _N_E = (window.webpackJsonp_N_E = window.webpackJsonp_N_E || []).push([
                                     lineNumber: 147,
                                     columnNumber: 29
                                 }
-                            }, "\xa9 thaum 2020")))), me(V.a, {
+                            }, "\xa9 thaum 2023")))), me(V.a, {
                                 onEnter: function() {
                                     e.setState({
                                         appear: !0
