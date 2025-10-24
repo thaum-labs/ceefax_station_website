@@ -2609,7 +2609,7 @@ _N_E = (window.webpackJsonp_N_E = window.webpackJsonp_N_E || []).push([
                                     lineNumber: 147,
                                     columnNumber: 29
                                 }
-                            }, "\xa9 thaum 2023")))), me(V.a, {
+                            }, "\xa9 thaum 2025")))), me(V.a, {
                                 onEnter: function() {
                                     e.setState({
                                         appear: !0
