@@ -3364,3 +3364,12 @@ _N_E = (window.webpackJsonp_N_E = window.webpackJsonp_N_E || []).push([
         ["H0SL", 0, 2, 1]
     ]
 ]);
+
+
+// Auto-update footer year
+if (typeof window !== "undefined") {
+  document.addEventListener("DOMContentLoaded", () => {
+    const yearElement = document.getElementById("year");
+    if (yearElement) yearElement.textContent = new Date().getFullYear();
+  });
+}
