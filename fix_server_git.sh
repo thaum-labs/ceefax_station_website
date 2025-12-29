@@ -7,16 +7,16 @@ set -e
 echo "=== Fixing Git Branch Configuration ==="
 echo ""
 
-cd /root/ceefax_station_website
+cd /root/ceefax_station
 
 # Check if it's a git repository
 if [ ! -d .git ]; then
     echo "ERROR: Not a git repository!"
     echo "Re-cloning repository..."
     cd /root
-    rm -rf ceefax_station_website
-    git clone https://github.com/thaum-labs/ceefax_station_website.git
-    cd ceefax_station_website
+    rm -rf ceefax_station
+    git clone https://github.com/thaum-labs/ceefax_station.git
+    cd ceefax_station
     echo "Repository cloned successfully."
 else
     echo "Git repository found."
