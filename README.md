@@ -42,7 +42,7 @@ A modern recreation of the classic Ceefax teletext service, running on Windows w
 
 ### Prerequisites
 - Python 3.11+
-- Windows (Linux/macOS support available)
+- Windows
 
 ### Installation
 
