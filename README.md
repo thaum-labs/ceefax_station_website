@@ -48,8 +48,8 @@ A modern recreation of the classic Ceefax teletext service, running on Windows w
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/thaum-labs/ceefax_station_website.git
-cd ceefax_station_website
+git clone https://github.com/thaum-labs/ceefax_station.git
+cd ceefax_station
 ```
 
 2. Install dependencies:
@@ -176,7 +176,7 @@ Created by M7TJF
 ## Links
 
 - **Live Tracker**: [ceefaxstation.com](https://ceefaxstation.com)
-- **Repository**: [github.com/thaum-labs/ceefax_station_website](https://github.com/thaum-labs/ceefax_station_website)
+- **Repository**: [github.com/thaum-labs/ceefax_station](https://github.com/thaum-labs/ceefax_station)
 
 ---
 

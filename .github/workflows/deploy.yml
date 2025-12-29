@@ -16,7 +16,7 @@ jobs:
           username: ${{ secrets.DO_USER }}
           key: ${{ secrets.DO_SSH_KEY }}
           script: |
-            cd /root/ceefax_station_website
+            cd /root/ceefax_station
             git fetch origin
             git reset --hard origin/main
             systemctl restart ceefaxweb

@@ -19,7 +19,7 @@ chmod 700 ~/.ssh
 
 ## Step 2: Add Secrets to GitHub
 
-Go to: https://github.com/thaum-labs/ceefax_station_website/settings/secrets/actions
+Go to: https://github.com/thaum-labs/ceefax_station/settings/secrets/actions
 
 Click "New repository secret" and add these three secrets:
 
@@ -54,5 +54,5 @@ git commit --allow-empty -m "Test automatic deployment"
 git push
 ```
 
-Then check: https://github.com/thaum-labs/ceefax_station_website/actions
+Then check: https://github.com/thaum-labs/ceefax_station/actions
 
