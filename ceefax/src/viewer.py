@@ -258,6 +258,38 @@ def _write_json(path: Path, data: dict) -> None:
     path.write_text(json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8")
 
 
+def _load_radio_config() -> dict:
+    """
+    Best-effort read of ceefax/radio_config.json so RX logs can include frequency/grid
+    metadata for the web tracker.
+    """
+    try:
+        ceefax_root = Path(__file__).resolve().parent.parent
+        p = ceefax_root / "radio_config.json"
+        if not p.exists():
+            return {}
+        return json.loads(p.read_text(encoding="utf-8"))
+    except Exception:  # noqa: BLE001
+        return {}
+
+
+_AUDIO_LEVEL_RE = re.compile(r"audio level[^0-9\\-]*(-?\\d+(?:\\.\\d+)?)", re.I)
+
+
+def _maybe_update_audio_db(stats: dict, *, line: str) -> None:
+    """
+    Dire Wolf sometimes prints signal lines like "audio level ...".
+    We treat the numeric value as a best-effort dB-ish indicator.
+    """
+    m = _AUDIO_LEVEL_RE.search(line or "")
+    if not m:
+        return
+    try:
+        stats["rx_db"] = float(m.group(1))
+    except Exception:  # noqa: BLE001
+        return
+
+
 def _update_rx_log_summary(stats: dict) -> None:
     """
     Populate derived summary fields in-place so the log is easy to consume.
@@ -373,6 +405,8 @@ def _rx_pages_from_wav_with_direwolf(
 
             # Skip signal level lines etc.
             if "audio level" in line:
+                with stats_lock:
+                    _maybe_update_audio_db(stats, line=line)
                 continue
             if ">" not in line or ":" not in line:
                 if len(early_lines) < 8 and line.strip():
@@ -484,6 +518,8 @@ def _rx_pages_from_wav_with_direwolf(
                         "subpage": page_obj.subpage,
                         "title": page_obj.title,
                         "first_complete_rx_s": ts_s,
+                        "rx_db": stats.get("rx_db"),
+                        "frequency": stats.get("frequency"),
                     }
                 # Immediate log flush on page completion so logs always contain decoded pages.
                 if log_path:
@@ -598,6 +634,8 @@ def _rx_pages_from_live_with_direwolf(
             line = raw.decode("latin-1", errors="replace")
 
             if "audio level" in line:
+                with stats_lock:
+                    _maybe_update_audio_db(stats, line=line)
                 continue
             if ">" not in line or ":" not in line:
                 if len(early_lines) < 8 and line.strip():
@@ -697,6 +735,8 @@ def _rx_pages_from_live_with_direwolf(
                         "subpage": page_obj.subpage,
                         "title": page_obj.title,
                         "first_complete_rx_s": ts_s,
+                        "rx_db": stats.get("rx_db"),
+                        "frequency": stats.get("frequency"),
                     }
                 if log_path:
                     stats["updated_at"] = datetime.now().isoformat()
@@ -867,7 +907,7 @@ def _draw_page(
         )
 
     # Remaining lines: show from matrix[1:] (timestamp + content),
-    # formatted with a bold heading and blue rule beneath it.
+    # formatted with a bold heading and a yellow rule beneath it.
     start_row = art_row + len(ceefax_art)
 
     # Treat matrix[2:] (compiled content rows) as on-screen content.
@@ -939,7 +979,8 @@ def _draw_page(
         if not has_own_rule and current_row < offset_y + PAGE_HEIGHT:
             rule_text = "-" * PAGE_WIDTH
             if curses.has_colors():
-                rule_attr = curses.color_pair(6)
+                # Keep separators uniform: always yellow (same as body text).
+                rule_attr = body_attr
             else:
                 rule_attr = curses.A_UNDERLINE
             stdscr.addstr(current_row, offset_x, rule_text[:PAGE_WIDTH], rule_attr)
@@ -1050,6 +1091,8 @@ def _rx_viewer_loop_from_wav(
     q: "queue.Queue[tuple[Page, List[str]]]" = queue.Queue()
     stop_event = threading.Event()
     stats_lock = threading.Lock()
+    rcfg = _load_radio_config()
+    freq = (rcfg.get("frequency") or "").strip() if isinstance(rcfg, dict) else ""
     stats: dict = {
         "schema": 1,
         "listener_callsign": (listener_callsign or "").strip(),
@@ -1057,6 +1100,8 @@ def _rx_viewer_loop_from_wav(
         "wav_path": str(wav_path),
         "wav_name": Path(wav_path).name,
         "started_at": datetime.now().isoformat(),
+        "frequency": freq or None,
+        "rx_db": None,
         "station_callsign": None,
         "tx_id": None,
         "tx_ids_seen": [],
@@ -1174,6 +1219,8 @@ def _rx_viewer_loop_live(
     q: "queue.Queue[tuple[Page, List[str]]]" = queue.Queue()
     stop_event = threading.Event()
     stats_lock = threading.Lock()
+    rcfg = _load_radio_config()
+    freq = (rcfg.get("frequency") or "").strip() if isinstance(rcfg, dict) else ""
 
     # Create a stable log path for the session.
     live_ts = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -1186,6 +1233,8 @@ def _rx_viewer_loop_live(
         "dest_filter": dest_filter,
         "rx_mode": "live",
         "started_at": datetime.now().isoformat(),
+        "frequency": freq or None,
+        "rx_db": None,
         "station_callsign": None,
         "tx_id": None,
         "tx_ids_seen": [],

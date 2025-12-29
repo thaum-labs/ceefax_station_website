@@ -385,10 +385,13 @@ def _pack_sections_into_two_pages(
     per_page: int,
 ) -> Tuple[List[str], List[str]]:
     """
-    Pack channel sections into two pages while trying to keep them equally full.
+    Pack channel sections into two pages, preserving channel order:
+      BBC (1/2/3...) first, then ITV, then Channel 4.
 
-    Sections are kept intact (not split across pages). If a section is too large,
-    it is truncated to fit.
+    We only split *between* channel sections (never inside), and choose the split
+    point that best balances page fullness while staying within `per_page`.
+
+    If a section is too large to fit on a single page, it is truncated.
     """
     # Create a list of (channel, lines) in preferred channel order.
     ordered: List[Tuple[str, List[str]]] = []
@@ -417,39 +420,49 @@ def _pack_sections_into_two_pages(
         else:
             trimmed.append((ch, lines))
 
-    # Greedy bin-pack into 2 pages by section size (largest first).
-    trimmed.sort(key=lambda x: len(x[1]), reverse=True)
-    p1: List[str] = []
-    p2: List[str] = []
-    p1_n = 0
-    p2_n = 0
+    # Choose best split point between sections (preserve order).
+    sizes = [len(lines) for _ch, lines in trimmed]
+    total = sum(sizes)
 
-    for _ch, lines in trimmed:
-        # Prefer the page with fewer lines used, but don't overflow.
-        target_1 = p1_n <= p2_n
-        if target_1:
-            if p1_n + len(lines) <= per_page:
+    best_k = len(trimmed)  # all on page 1 if it fits
+    best_score: float | None = None
+
+    # k = number of sections on page 1
+    for k in range(len(trimmed) + 1):
+        s1 = sum(sizes[:k])
+        s2 = total - s1
+        if s1 > per_page or s2 > per_page:
+            continue
+        # Minimize difference; tie-breaker: fill page 1 slightly more.
+        score = abs(s1 - s2) + (0.01 if s1 < s2 else 0.0)
+        if best_score is None or score < best_score:
+            best_score = score
+            best_k = k
+
+    # If nothing fits (total > 2*per_page), fall back to "fill page 1 then page 2",
+    # still preserving order and dropping overflow.
+    if best_score is None:
+        p1: List[str] = []
+        p2: List[str] = []
+        n1 = 0
+        n2 = 0
+        for _ch, lines in trimmed:
+            if n1 + len(lines) <= per_page:
                 p1.extend(lines)
-                p1_n += len(lines)
-                continue
-            if p2_n + len(lines) <= per_page:
+                n1 += len(lines)
+            elif n2 + len(lines) <= per_page:
                 p2.extend(lines)
-                p2_n += len(lines)
+                n2 += len(lines)
+            else:
                 continue
-        else:
-            if p2_n + len(lines) <= per_page:
-                p2.extend(lines)
-                p2_n += len(lines)
-                continue
-            if p1_n + len(lines) <= per_page:
-                p1.extend(lines)
-                p1_n += len(lines)
-                continue
+        return (p1[:per_page], p2[:per_page])
 
-        # If it doesn't fit, drop it (we already truncated oversized sections).
-        # This is rare; it would mean total content exceeds 2 pages.
-        continue
-
+    p1 = []
+    for _ch, lines in trimmed[:best_k]:
+        p1.extend(lines)
+    p2 = []
+    for _ch, lines in trimmed[best_k:]:
+        p2.extend(lines)
     return (p1[:per_page], p2[:per_page])
 
 

@@ -1,0 +1,107 @@
+from __future__ import annotations
+
+import json
+import os
+from pathlib import Path
+from typing import Any
+
+from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
+from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.staticfiles import StaticFiles
+
+from .db import connect, default_db_path, ingest_log, init_db, query_link_detail, query_map
+
+
+def _repo_root() -> Path:
+    return Path(__file__).resolve().parent.parent
+
+
+class Hub:
+    def __init__(self) -> None:
+        self.websockets: set[WebSocket] = set()
+
+    async def broadcast(self, msg: dict[str, Any]) -> None:
+        dead: list[WebSocket] = []
+        for ws in list(self.websockets):
+            try:
+                await ws.send_text(json.dumps(msg))
+            except Exception:  # noqa: BLE001
+                dead.append(ws)
+        for ws in dead:
+            self.websockets.discard(ws)
+
+
+def create_app() -> FastAPI:
+    app = FastAPI(title="Ceefaxstation Tracker")
+    hub = Hub()
+
+    db_path = Path(os.environ.get("CEEFAXWEB_DB", "")).expanduser() if os.environ.get("CEEFAXWEB_DB") else default_db_path(_repo_root())
+    conn = connect(db_path)
+    init_db(conn)
+
+    static_dir = Path(__file__).resolve().parent / "static"
+    app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
+
+    @app.get("/", response_class=HTMLResponse)
+    def index() -> str:
+        return (static_dir / "index.html").read_text(encoding="utf-8")
+
+    @app.get("/api/map")
+    def api_map(range: str = "24h") -> JSONResponse:  # noqa: A002
+        return JSONResponse(query_map(conn, range_key=range))
+
+    @app.get("/api/link")
+    def api_link(tx: str, rx: str, range: str = "24h") -> JSONResponse:  # noqa: A002
+        return JSONResponse(query_link_detail(conn, tx=tx, rx=rx, range_key=range))
+
+    @app.post("/api/ingest/log")
+    async def api_ingest(body: dict[str, Any]) -> JSONResponse:
+        """
+        Ingest a single TX/RX log blob.
+
+        Body format:
+          {
+            "token": "...",                 // optional (required if server configured)
+            "uploader": {"callsign": "...", "grid": "IO91..."},  // optional but recommended
+            "source_path": "ceefax/logs_tx/....json",           // optional
+            "log": {...}                    // required: the log JSON
+          }
+        """
+        required_token = os.environ.get("CEEFAXWEB_UPLOAD_TOKEN") or ""
+        token = str(body.get("token") or "")
+        if required_token and token != required_token:
+            raise HTTPException(status_code=401, detail="invalid token")
+
+        uploader = body.get("uploader") or {}
+        up_callsign = str(uploader.get("callsign") or "").strip().upper() or None
+        up_grid = str(uploader.get("grid") or "").strip().upper() or None
+        src = str(body.get("source_path") or "") or None
+        log = body.get("log")
+        if not isinstance(log, dict):
+            raise HTTPException(status_code=400, detail="missing log")
+
+        inserted, reason = ingest_log(conn, payload=log, uploader_callsign=up_callsign, uploader_grid=up_grid, source_path=src)
+        if inserted:
+            await hub.broadcast({"type": "ingested", "reason": reason})
+        return JSONResponse({"ok": True, "inserted": inserted, "reason": reason})
+
+    @app.websocket("/ws")
+    async def ws_endpoint(ws: WebSocket) -> None:
+        await ws.accept()
+        hub.websockets.add(ws)
+        try:
+            await ws.send_text(json.dumps({"type": "hello"}))
+            while True:
+                # keepalive / ignore client messages
+                await ws.receive_text()
+        except WebSocketDisconnect:
+            pass
+        finally:
+            hub.websockets.discard(ws)
+
+    return app
+
+
+app = create_app()
+
+

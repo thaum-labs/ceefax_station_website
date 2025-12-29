@@ -102,3 +102,31 @@ dist
 
 # TernJS port file
 .tern-port
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv*/
+venv*/
+env/
+ENV/
+*.egg-info/
+dist/
+build/
+
+# Ceefax specific
+ceefax/cache/
+ceefax/logs_rx/
+ceefax/logs_tx/
+ceefax/pages/
+ceefax/out/
+ceefax/.venv*/
+ceefax/activity_log.json
+ceefax/config.toml
+ceefax/radio_config.json
+*.sqlite3
+*.sqlite3-shm
+*.sqlite3-wal

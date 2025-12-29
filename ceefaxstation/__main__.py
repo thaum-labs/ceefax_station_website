@@ -165,6 +165,19 @@ def main(argv: list[str] | None = None) -> int:
     )
     sub = parser.add_subparsers(dest="cmd", required=True)
 
+    # ---- upload ----
+    p_upload = sub.add_parser("upload", help="Upload logs_tx/logs_rx to a server for the public tracker website.")
+    p_upload.add_argument(
+        "--server",
+        default="https://ceefaxstation.com",
+        help="Server base URL (default: https://ceefaxstation.com). Use http://127.0.0.1:8088 for local testing.",
+    )
+    p_upload.add_argument("--token", default=None, help="Upload token (optional; required if server enforces).")
+    p_upload.add_argument("--callsign", default=None, help="Uploader callsign (defaults to ceefax/radio_config.json).")
+    p_upload.add_argument("--grid", default=None, help="Uploader Maidenhead grid (e.g. IO91wm) (defaults to ceefax/radio_config.json).")
+    p_upload.add_argument("--poll", type=float, default=2.0, help="Poll interval seconds (default 2.0).")
+    p_upload.add_argument("--once", action="store_true", help="Upload current logs once and exit (no watching).")
+
     # ---- shell ----
     p_shell = sub.add_parser(
         "shell",
@@ -293,6 +306,19 @@ def main(argv: list[str] | None = None) -> int:
     p_tx_now.add_argument("--play-player", default=None)
 
     args = parser.parse_args(argv)
+
+    if args.cmd == "upload":
+        from ceefaxstation.uploader import upload_logs
+
+        upload_logs(
+            server_url=str(args.server),
+            token=args.token,
+            uploader_callsign=(str(args.callsign).strip().upper() if args.callsign else None),
+            uploader_grid=(str(args.grid).strip().upper() if args.grid else None),
+            poll_seconds=float(args.poll),
+            once=bool(args.once),
+        )
+        return 0
 
     if args.cmd == "shell":
         root = str(_repo_root())
