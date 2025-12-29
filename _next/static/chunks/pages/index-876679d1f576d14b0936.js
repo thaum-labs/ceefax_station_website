@@ -2609,7 +2609,7 @@ _N_E = (window.webpackJsonp_N_E = window.webpackJsonp_N_E || []).push([
                                     lineNumber: 147,
                                     columnNumber: 29
                                 }
-                            }, "\xa9 thaum 2023")))), me(V.a, {
+                            }, "\xa9 thaum 2025")))), me(V.a, {
                                 onEnter: function() {
                                     e.setState({
                                         appear: !0
@@ -3364,3 +3364,12 @@ _N_E = (window.webpackJsonp_N_E = window.webpackJsonp_N_E || []).push([
         ["H0SL", 0, 2, 1]
     ]
 ]);
+
+
+// Auto-update footer year
+if (typeof window !== "undefined") {
+  document.addEventListener("DOMContentLoaded", () => {
+    const yearElement = document.getElementById("year");
+    if (yearElement) yearElement.textContent = new Date().getFullYear();
+  });
+}
