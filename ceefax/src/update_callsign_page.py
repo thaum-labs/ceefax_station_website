@@ -33,6 +33,20 @@ def get_callsign_from_config() -> Optional[str]:
     return None
 
 
+def get_grid_from_config() -> Optional[str]:
+    """Get Maidenhead grid square from radio_config.json."""
+    try:
+        root = Path(__file__).resolve().parent.parent
+        config_file = root / "radio_config.json"
+        if config_file.exists():
+            config_data = json.loads(config_file.read_text(encoding="utf-8"))
+            grid = config_data.get("grid")
+            return (grid or "").strip().upper() or None
+    except Exception:  # noqa: BLE001
+        pass
+    return None
+
+
 def fetch_psk_reporter_data(callsign: str) -> Optional[ET.Element]:
     """
     Fetch callsign data from PSK Reporter.
@@ -321,10 +335,15 @@ def build_callsign_page(callsign: str) -> List[str]:
     """Build callsign information page."""
     lines: List[str] = []
     lines.append(_pad("CALLSIGN INFORMATION"))
-    lines.append(_pad(""))
     
     sep = _pad("-" * PAGE_WIDTH)
     lines.append(_pad(f"CALLSIGN: {callsign.upper()}"))
+    
+    # Add grid square if available
+    grid = get_grid_from_config()
+    if grid:
+        lines.append(_pad(f"GRID: {grid}"))
+    
     lines.append(sep)
     
     # Fetch data from PSK Reporter
@@ -437,9 +456,13 @@ def main() -> None:
     
     if not callsign:
         # Create a placeholder page if no callsign is set
+        grid = get_grid_from_config()
         content = [
             _pad("CALLSIGN INFORMATION"),
-            _pad(""),
+        ]
+        if grid:
+            content.append(_pad(f"GRID: {grid}"))
+        content.extend([
             _pad("-" * PAGE_WIDTH),
             _pad(""),
             _pad("No callsign configured."),
@@ -449,7 +472,7 @@ def main() -> None:
             _pad("PSK Reporter data here."),
             _pad(""),
             _pad("Source: PSK Reporter"),
-        ]
+        ])
         print(f"Updated {page_file} with callsign placeholder (no callsign set)")
     else:
         content = build_callsign_page(callsign)

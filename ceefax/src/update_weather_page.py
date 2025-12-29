@@ -502,6 +502,27 @@ def main(user_location: Optional[Tuple[str, str]] = None) -> None:
             name = "London"
             query = "London,GB"
 
+    # Save detected grid to config if available (only if not already set)
+    detected_grid = None
+    if not user_location and location:
+        if len(location) == 4:
+            detected_grid = location[3]  # grid is the 4th element
+        # Get callsign from config to save grid
+        if detected_grid:
+            try:
+                config_file = root / "radio_config.json"
+                if config_file.exists():
+                    config_data = json.loads(config_file.read_text(encoding="utf-8"))
+                    callsign = config_data.get("callsign")
+                    if callsign:
+                        # Import persist function from update_all
+                        from .update_all import persist_radio_config
+                        persist_radio_config(callsign, config_data.get("frequency"), detected_grid)
+                        print(f"Saved detected grid square {detected_grid} to radio_config.json")
+            except Exception as e:  # noqa: BLE001
+                # Don't fail if grid saving fails, but log for debugging
+                print(f"Note: Could not save grid to config: {e}")
+    
     # Create only ONE page (102.json) with user's location
     page_lines = build_single_location_weather_page(name, query)
     page_file = pages_dir / "102.json"
