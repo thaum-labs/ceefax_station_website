@@ -168,6 +168,7 @@ def auto_detect_location_silent() -> Tuple[str, str]:
     """
     Non-interactive location detection for scheduled runs.
     Returns (name, query) where query is suitable for wttr.in.
+    Also saves detected grid square to radio_config.json if available.
     """
     try:
         from .update_weather_page import get_location_from_ip, get_location_from_timezone
@@ -176,12 +177,31 @@ def auto_detect_location_silent() -> Tuple[str, str]:
         if not location:
             location = get_location_from_timezone()
         if location:
+            detected_grid = None
             if len(location) == 4:
-                _lat, _lon, city, _grid = location
+                _lat, _lon, city, detected_grid = location
             else:
                 _lat, _lon, city = location
             city_name = city.split(",")[0] if "," in city else city
             # Default to GB for simplicity; wttr.in accepts "City,GB"
+            
+            # Save detected grid to config if available (only if not already set)
+            if detected_grid:
+                try:
+                    import json
+                    from pathlib import Path as PathLib
+                    root = PathLib(__file__).resolve().parent.parent
+                    config_file = root / "radio_config.json"
+                    if config_file.exists():
+                        config_data = json.loads(config_file.read_text(encoding="utf-8"))
+                        callsign = config_data.get("callsign")
+                        if callsign:
+                            persist_radio_config(callsign, config_data.get("frequency"), detected_grid)
+                            print(f"Saved detected grid square {detected_grid} to radio_config.json")
+                except Exception as e:  # noqa: BLE001
+                    # Don't fail if grid saving fails, but log for debugging
+                    print(f"Note: Could not save grid to config: {e}")
+            
             return (city_name, f"{city_name},GB")
     except Exception:  # noqa: BLE001
         pass
