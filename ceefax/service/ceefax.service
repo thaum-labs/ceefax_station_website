@@ -1,0 +1,18 @@
+[Unit]
+Description=Ceefax Station Broadcast System
+After=network.target sound.target
+
+[Service]
+Type=simple
+# Adjust ExecStart to your Python path and project root
+ExecStart=/usr/bin/python3 -m ceefaxstation tx hourly --refresh-lead 300 --carousel-loops 3 --play --play-loops 1
+# Set this to the repository root (the directory that contains `ceefax/` and `ceefaxstation/`)
+WorkingDirectory=/home/pi/thaum-public
+Restart=on-failure
+User=pi
+Group=pi
+
+[Install]
+WantedBy=multi-user.target
+
+
