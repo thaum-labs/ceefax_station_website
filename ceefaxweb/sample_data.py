@@ -99,12 +99,21 @@ def main() -> int:
     args = ap.parse_args()
 
     now = datetime.now(timezone.utc)
-    # A few stations around the UK for visible lines
+    # 6 stations: 2 transmitting, 4 listening
+    # TX stations: M7TJF, G4ABC
+    # RX stations: M0XYZ, G8DEF, G9GHI, M1JKL
     samples = [
         # TX -> RX with some loss
-        ("M7TJF", "IO91WM", "G4ABC", "IO91VW"),
-        ("M7TJF", "IO91WM", "M0XYZ", "IO83PR"),
-        ("G4ABC", "IO91VW", "M0XYZ", "IO83PR"),
+        ("M7TJF", "IO91WM", "M0XYZ", "IO83PR"),  # TX1 -> RX1 (receives some pages)
+        ("M7TJF", "IO91WM", "G8DEF", "IO92AB"),  # TX1 -> RX2 (receives some pages)
+        ("G4ABC", "IO91VW", "G9GHI", "IO93CD"),   # TX2 -> RX3 (receives some pages)
+        ("G4ABC", "IO91VW", "M1JKL", "IO94EF"),   # TX2 -> RX4 (receives some pages)
+    ]
+    
+    # Listening-only stations (no reception)
+    listening_only = [
+        ("G8DEF", "IO92AB"),  # RX2 also listening independently
+        ("G9GHI", "IO93CD"),  # RX3 also listening independently
     ]
 
     pages = ["200", "300", "301", "402", "503", "503.2", "600"]
@@ -145,6 +154,44 @@ def main() -> int:
                 }
                 r = requests.post(ingest_url, json=body, timeout=20)
                 r.raise_for_status()
+    
+    # Create listening-only logs (no reception)
+    for rx_cs, rx_grid in listening_only:
+        gen_at = now - timedelta(minutes=30)
+        rx_listening = {
+            "schema": 1,
+            "listener_callsign": rx_cs,
+            "listener_grid": rx_grid,
+            "dest_filter": "CEEFAX",
+            "rx_mode": "live",
+            "started_at": _iso(gen_at),
+            "updated_at": _iso(gen_at + timedelta(minutes=5)),
+            "station_callsign": None,
+            "tx_id": None,
+            "tx_ids_seen": [],
+            "cfx_frames": 0,
+            "stations_heard": {},
+            "pages_decoded": {},  # Empty - just listening
+            "decoded_page_count": 0,
+            "pages_seen_count": 0,
+            "partial_page_count": 0,
+            "complete_by_progress_count": 0,
+        }
+        
+        if args.write:
+            rx_path = out_rx / f"sample_rx_{rx_cs}_listening_{gen_at.strftime('%Y%m%d_%H%M%S')}.json"
+            _write_json(rx_path, rx_listening)
+        
+        if server:
+            ingest_url = server + "/api/ingest/log"
+            body = {
+                "token": args.token,
+                "uploader": {"callsign": rx_cs, "grid": rx_grid},
+                "source_path": f"sample:{rx_cs}:listening",
+                "log": rx_listening,
+            }
+            r = requests.post(ingest_url, json=body, timeout=20)
+            r.raise_for_status()
 
     print("Sample data generated.")
     if args.write:

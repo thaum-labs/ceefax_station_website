@@ -2059,9 +2059,11 @@ def _rx_viewer_loop_from_wav(
     stats_lock = threading.Lock()
     rcfg = _load_radio_config()
     freq = (rcfg.get("frequency") or "").strip() if isinstance(rcfg, dict) else ""
+    grid = (rcfg.get("grid") or "").strip().upper() if isinstance(rcfg, dict) else ""
     stats: dict = {
         "schema": 1,
         "listener_callsign": (listener_callsign or "").strip(),
+        "listener_grid": grid or None,
         "dest_filter": dest_filter,
         "wav_path": str(wav_path),
         "wav_name": Path(wav_path).name,
@@ -2185,6 +2187,7 @@ def _rx_viewer_loop_live(
     stats_lock = threading.Lock()
     rcfg = _load_radio_config()
     freq = (rcfg.get("frequency") or "").strip() if isinstance(rcfg, dict) else ""
+    grid = (rcfg.get("grid") or "").strip().upper() if isinstance(rcfg, dict) else ""
 
     # Create a stable log path for the session.
     live_ts = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -2194,6 +2197,7 @@ def _rx_viewer_loop_live(
     stats: dict = {
         "schema": 1,
         "listener_callsign": (listener_callsign or "").strip(),
+        "listener_grid": grid or None,
         "dest_filter": dest_filter,
         "rx_mode": "live",
         "started_at": datetime.now().isoformat(),
