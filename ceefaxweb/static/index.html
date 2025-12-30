@@ -169,14 +169,13 @@
           </div>
           <div class="muted" id="linkMeta"></div>
           <div class="muted" id="linkDistance" style="margin-top:6px;"></div>
-          <div style="margin-top:10px;">
+          <div style="margin-top:10px;" id="linkTableContainer">
             <table>
               <thead>
                 <tr>
                   <th>Page</th>
                   <th class="cell-center">TX</th>
                   <th class="cell-center">RX</th>
-                  <th>Freq</th>
                   <th>dB</th>
                   <th>Age</th>
                 </tr>
@@ -214,7 +213,6 @@
       const linkTitle = document.getElementById('linkTitle');
       const linkMeta = document.getElementById('linkMeta');
       const linkDistance = document.getElementById('linkDistance');
-      const linkTable = document.getElementById('linkTable');
 
       let stationMarkers = new Map(); // callsign -> {layers:[]}
       let linkLayers = [];
@@ -429,11 +427,17 @@
         }
 
         const rows = Array.isArray(d.rows) ? d.rows : [];
-        linkTable.innerHTML = '';
+        const container = document.getElementById('linkTableContainer');
+        container.innerHTML = '';
+        
         if (rows.length === 0) {
+          const table = document.createElement('table');
+          const tbody = document.createElement('tbody');
           const tr = document.createElement('tr');
-          tr.innerHTML = `<td colspan="6" class="muted">No pages in this window.</td>`;
-          linkTable.appendChild(tr);
+          tr.innerHTML = `<td colspan="5" class="muted">No pages in this window.</td>`;
+          tbody.appendChild(tr);
+          table.appendChild(tbody);
+          container.appendChild(table);
           return;
         }
 
@@ -453,23 +457,66 @@
           return `<span class="boxmark box-bad">✗</span>`;
         }
 
+        // Group rows by frequency
+        const rowsByFreq = new Map();
         for (const r of rows) {
-          const page = r.page_id || '-';
-          const txOk = !!r.tx;
-          const rxOk = !!r.rx_ok;
-          const freq = r.frequency || '-';
-          const db = (r.rx_db == null ? '-' : `${Number(r.rx_db).toFixed(1)}`);
-          const age = fmtAge(r.age_s);
-          const tr = document.createElement('tr');
-          tr.innerHTML = `
-            <td>${page}</td>
-            <td class="cell-center">${box(txOk)}</td>
-            <td class="cell-center">${box(rxOk)}</td>
-            <td>${freq}</td>
-            <td>${db}</td>
-            <td>${age}</td>
+          const freq = r.frequency || 'Unknown';
+          if (!rowsByFreq.has(freq)) {
+            rowsByFreq.set(freq, []);
+          }
+          rowsByFreq.get(freq).push(r);
+        }
+
+        // Create a table for each frequency
+        const frequencies = Array.from(rowsByFreq.keys()).sort();
+        for (let i = 0; i < frequencies.length; i++) {
+          const freq = frequencies[i];
+          const freqRows = rowsByFreq.get(freq);
+          
+          // Frequency header
+          const freqHeader = document.createElement('div');
+          freqHeader.style.marginTop = i > 0 ? '20px' : '0';
+          freqHeader.style.marginBottom = '8px';
+          freqHeader.style.fontWeight = '600';
+          freqHeader.style.color = '#ffd34d';
+          freqHeader.style.fontSize = '14px';
+          freqHeader.textContent = freq;
+          container.appendChild(freqHeader);
+
+          // Table for this frequency
+          const table = document.createElement('table');
+          const thead = document.createElement('thead');
+          const headerRow = document.createElement('tr');
+          headerRow.innerHTML = `
+            <th>Page</th>
+            <th class="cell-center">TX</th>
+            <th class="cell-center">RX</th>
+            <th>dB</th>
+            <th>Age</th>
           `;
-          linkTable.appendChild(tr);
+          thead.appendChild(headerRow);
+          table.appendChild(thead);
+
+          // Table body
+          const tbody = document.createElement('tbody');
+          for (const r of freqRows) {
+            const page = r.page_id || '-';
+            const txOk = !!r.tx;
+            const rxOk = !!r.rx_ok;
+            const db = (r.rx_db == null ? '-' : `${Number(r.rx_db).toFixed(1)}`);
+            const age = fmtAge(r.age_s);
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+              <td>${page}</td>
+              <td class="cell-center">${box(txOk)}</td>
+              <td class="cell-center">${box(rxOk)}</td>
+              <td>${db}</td>
+              <td>${age}</td>
+            `;
+            tbody.appendChild(tr);
+          }
+          table.appendChild(tbody);
+          container.appendChild(table);
         }
       }
 
