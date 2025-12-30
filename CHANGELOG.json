@@ -14,7 +14,14 @@
         "Added changelog and versioning system",
         "Created changelog display on website",
         "Added API endpoints for version and changelog",
-        "Created helper script for adding changelog entries"
+        "Created helper script for adding changelog entries",
+        "Added keyboard commands for TX and RX modes in viewer (r: RX, t: TX, F5: Reload, ESC: Exit)",
+        "Replaced Fastext color labels with keyboard command labels for better user guidance",
+        "Fixed TX mode hang during page refresh by running update_all() in background thread",
+        "Added prime_user_settings() to prevent input prompts during TX mode refresh",
+        "Significantly improved UK weather and weather map page load times with caching and parallel fetching",
+        "Added 10-minute cache for wttr.in API responses to reduce API calls",
+        "Implemented parallel fetching for multiple weather locations simultaneously"
       ]
     }
   ]
