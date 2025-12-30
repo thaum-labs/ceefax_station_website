@@ -59,9 +59,10 @@ jobs:
             echo "yes" | python3 -m ceefaxweb.scripts.replace_callsign SM6OPW TEST1 2>&1 || echo "Replacement check completed (SM6OPW may not exist or already replaced)"
 
             echo ""
-            echo "=== Update frequency formats (range -> specific) ==="
+            echo "=== Delete and re-upload sample data (with correct frequency format) ==="
             cd "${REPO_DIR}"
-            python3 -m ceefaxweb.scripts.update_frequencies 2>&1 || echo "Frequency update completed (may have no old data to update)"
+            echo "yes" | python3 -m ceefaxweb.scripts.delete_sample_data --confirm 2>&1 || echo "Sample data deletion completed (may have no sample data)"
+            python3 -m ceefaxweb.sample_data --ingest http://127.0.0.1:8088 2>&1 || echo "Sample data upload completed"
 
             echo ""
             echo "=== Restart ceefaxweb ==="
