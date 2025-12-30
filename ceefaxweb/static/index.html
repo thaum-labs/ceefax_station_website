@@ -140,6 +140,11 @@
           <div class="muted">Stations require Maidenhead (grid) to appear on the map.</div>
         </div>
 
+        <div class="box" style="margin-top:12px;">
+          <div><a href="/changelog" style="text-decoration:underline; font-weight:600;">📋 View Changelog</a></div>
+          <div class="muted" style="margin-top:4px;">See what's new in version <span id="versionDisplayInline"></span></div>
+        </div>
+
         <div class="box">
           <div><strong>Legend</strong></div>
           <div class="legend">
@@ -483,6 +488,7 @@
 
       // Load version on page load
       const versionDisplay = document.getElementById('versionDisplay');
+      const versionDisplayInline = document.getElementById('versionDisplayInline');
       (async () => {
         try {
           const res = await fetch('/api/version');
@@ -491,9 +497,10 @@
             const version = data.version;
             const stage = version.includes('-alpha') ? 'alpha' : 
                          version.includes('-beta') ? 'beta' : 'release';
-            versionDisplay.textContent = `v${version}`;
-            if (stage !== 'release') {
-              versionDisplay.textContent += ` (${stage})`;
+            const versionText = `v${version}${stage !== 'release' ? ` (${stage})` : ''}`;
+            versionDisplay.textContent = versionText;
+            if (versionDisplayInline) {
+              versionDisplayInline.textContent = versionText;
             }
           }
         } catch (err) {
