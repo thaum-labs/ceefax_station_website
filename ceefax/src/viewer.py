@@ -1078,56 +1078,173 @@ def _draw_ascii_progress_bar(stdscr: "curses._CursesWindow", row: int, col: int,
 
 def _draw_tx_screen(stdscr: "curses._CursesWindow", status: str, progress: float = 0.0, progress_label: str = "", countdown: str = "", message: str = "") -> None:
     """
-    Draw TX mode screen with progress bars and status.
+    Draw TX mode screen styled like a Ceefax page (centered, with header bar).
     """
     stdscr.clear()
-    height, width = stdscr.getmaxyx()
+    max_y, max_x = stdscr.getmaxyx()
     
+    # Require at least PAGE_WIDTH x PAGE_HEIGHT area
+    if max_y < PAGE_HEIGHT or max_x < PAGE_WIDTH:
+        msg = f"Terminal too small. Need at least {PAGE_WIDTH}x{PAGE_HEIGHT}."
+        stdscr.addstr(0, 0, msg[: max_x - 1])
+        stdscr.refresh()
+        return
+    
+    # Center the frame (same as regular pages)
+    offset_y = max((max_y - PAGE_HEIGHT) // 2, 0)
+    offset_x = max((max_x - PAGE_WIDTH) // 2, 0)
+    
+    # Build Ceefax-style header line
+    now = datetime.now()
+    clock = now.strftime("%H:%M %d %b").upper()
+    page_num = "TX "
+    title = "TRANSMIT MODE"
+    base_header = f"CEEFAX {page_num} {title}"
+    header_text = base_header[:PAGE_WIDTH].ljust(PAGE_WIDTH)
+    
+    # Colors (same as regular pages)
+    if curses.has_colors():
+        curses.start_color()
+        curses.use_default_colors()
+        curses.init_pair(1, curses.COLOR_YELLOW, curses.COLOR_BLUE)   # header
+        curses.init_pair(2, curses.COLOR_YELLOW, curses.COLOR_BLACK)  # body
+        header_attr = curses.color_pair(1) | curses.A_BOLD
+        body_attr = curses.color_pair(2)
+    else:
+        header_attr = curses.A_BOLD
+        body_attr = curses.A_NORMAL
+    
+    # Header (row 0) - yellow on blue
+    stdscr.addstr(offset_y, offset_x, header_text[:PAGE_WIDTH], header_attr)
+    
+    # Clock at top-right
+    clock_x = offset_x + max(PAGE_WIDTH - len(clock) - 1, 0)
+    stdscr.addstr(offset_y, clock_x, clock, header_attr)
+    
+    # Get callsign for header if available
+    callsign = ""
     try:
-        # Title
-        title = "CEEFAX STATION - TRANSMIT MODE"
-        title_col = max(0, (width - len(title)) // 2)
-        stdscr.addstr(1, title_col, title[:width - title_col])
-        
-        # Status line
-        status_text = f"Status: {status}"
-        stdscr.addstr(3, 2, status_text[:width - 3])
-        
-        # Progress bar area
-        if progress_label:
-            _draw_ascii_progress_bar(stdscr, 5, 2, min(40, width - 15), progress, progress_label)
-        
-        # Countdown
-        if countdown:
-            countdown_text = f"Next transmission in: {countdown}"
-            stdscr.addstr(7, 2, countdown_text[:width - 3])
-        
-        # Message
-        if message:
-            # Wrap message if needed
-            msg_lines = []
-            words = message.split()
-            current_line = ""
-            for word in words:
-                if len(current_line) + len(word) + 1 <= width - 4:
-                    current_line += (" " if current_line else "") + word
-                else:
-                    if current_line:
-                        msg_lines.append(current_line)
-                    current_line = word
-            if current_line:
+        from pathlib import Path
+        import json
+        root = Path(__file__).resolve().parent.parent
+        config_file = root / "radio_config.json"
+        if config_file.exists():
+            config_data = json.loads(config_file.read_text(encoding="utf-8"))
+            callsign = config_data.get("callsign", "").strip()
+    except Exception:  # noqa: BLE001
+        pass
+    
+    if callsign:
+        callsign_x = clock_x - len(callsign) - 2
+        if callsign_x >= offset_x:
+            stdscr.addstr(offset_y, callsign_x, callsign, header_attr)
+            stdscr.addstr(offset_y, callsign_x + len(callsign), "  ", header_attr)
+    
+    # Content area (inside a border like page 000)
+    border_top = offset_y + 1
+    border_bottom = offset_y + PAGE_HEIGHT - 1
+    inner_x = offset_x + 1
+    inner_width = max(PAGE_WIDTH - 2, 1)
+    
+    # Draw border
+    border_attr = body_attr | curses.A_BOLD
+    top_line = ("+" + ("-" * (PAGE_WIDTH - 2)) + "+")[:PAGE_WIDTH]
+    stdscr.addstr(border_top, offset_x, top_line, border_attr)
+    stdscr.addstr(border_bottom, offset_x, top_line, border_attr)
+    for row in range(border_top + 1, border_bottom):
+        stdscr.addstr(row, offset_x, "|", border_attr)
+        stdscr.addstr(row, offset_x + PAGE_WIDTH - 1, "|", border_attr)
+    
+    # Content lines (centered like page 000)
+    current_row = border_top + 1
+    row = current_row
+    
+    # Add status
+    if status:
+        row += 1
+        status_text = status.upper().center(inner_width)
+        stdscr.addstr(row, inner_x, status_text[:inner_width], body_attr | curses.A_BOLD)
+        row += 2
+    
+    # Add progress bar (centered)
+    if progress_label:
+        row += 1
+        bar_width = min(40, inner_width - 4)
+        bar_x = inner_x + (inner_width - bar_width) // 2
+        _draw_ascii_progress_bar(stdscr, row, bar_x, bar_width, progress, progress_label)
+        row += 2
+    
+    # Add countdown if present
+    if countdown:
+        countdown_text = f"NEXT TRANSMISSION IN: {countdown}"
+        countdown_centered = countdown_text.center(inner_width)
+        stdscr.addstr(row, inner_x, countdown_centered[:inner_width], body_attr | curses.A_BOLD)
+        row += 2
+    
+    # Add message if present (word-wrapped and centered)
+    if message:
+        row += 1
+        # Word wrap message to fit inner width
+        words = message.split()
+        msg_lines = []
+        current_line = ""
+        for word in words:
+            if not current_line:
+                current_line = word
+            elif len(current_line) + 1 + len(word) <= inner_width:
+                current_line += " " + word
+            else:
                 msg_lines.append(current_line)
-            
-            for i, line in enumerate(msg_lines[:5]):  # Max 5 lines
-                if 9 + i < height - 3:
-                    stdscr.addstr(9 + i, 2, line[:width - 4])
+                current_line = word
+        if current_line:
+            msg_lines.append(current_line)
         
-        # Instructions
-        if height > 3:
-            inst_text = "Press ESC to return to viewer"
-            stdscr.addstr(height - 3, 2, inst_text[:width - 3])
-    except curses.error:
-        pass  # Ignore out of bounds errors
+        for msg_line in msg_lines:
+            if row >= border_bottom - 3:
+                break
+            msg_centered = msg_line.center(inner_width)
+            stdscr.addstr(row, inner_x, msg_centered[:inner_width], body_attr | curses.A_BOLD)
+            row += 1
+        row += 1
+    
+    # Add ESC instruction at bottom
+    if row < border_bottom - 1:
+        esc_text = "PRESS ESC TO RETURN TO VIEWER"
+        esc_centered = esc_text.center(inner_width)
+        stdscr.addstr(border_bottom - 2, inner_x, esc_centered[:inner_width], body_attr | curses.A_BOLD)
+    
+    # Controls bar (same as regular pages)
+    controls_y = max_y - 2
+    if controls_y > offset_y + PAGE_HEIGHT:
+        if curses.has_colors():
+            labels = [
+                (" r: RX ", curses.color_pair(3) | curses.A_BOLD),      # RED
+                (" t: TX ", curses.color_pair(4) | curses.A_BOLD),      # GREEN
+                (" F5: Reload ", curses.color_pair(5) | curses.A_BOLD), # YELLOW
+                (" ESC: Exit ", curses.color_pair(6) | curses.A_BOLD),  # BLUE
+            ]
+            total_len = sum(len(text) for text, _ in labels)
+            x = max((max_x - 1 - total_len) // 2, 0)
+            for text, attr in labels:
+                if x >= max_x - 1:
+                    break
+                stdscr.addstr(controls_y, x, text[: max_x - 1 - x], attr)
+                x += len(text)
+        else:
+            line = "r: RX  t: TX  F5: Reload  ESC: Exit"
+            x = max((max_x - 1 - len(line)) // 2, 0)
+            stdscr.addstr(controls_y, x, line[: max_x - 1 - x])
+    
+    # Status line at bottom (same as regular pages)
+    status_line_text = "TRANSMIT MODE  Press ESC to return"
+    status_line = status_line_text[: max_x - 1]
+    pad_width = max_x - 1
+    start_x = max((pad_width - len(status_line)) // 2, 0)
+    
+    stdscr.attron(curses.A_REVERSE)
+    stdscr.addstr(max_y - 1, 0, " " * pad_width)
+    stdscr.addstr(max_y - 1, start_x, status_line)
+    stdscr.attroff(curses.A_REVERSE)
     
     stdscr.refresh()
 
