@@ -1,0 +1,368 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>About - Ceefax Station</title>
+    <style>
+      * { box-sizing: border-box; }
+      html, body { 
+        height: 100%; 
+        margin: 0; 
+        padding: 0;
+        font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+        background: #0b0b0b;
+        color: #f3f3f3;
+        line-height: 1.6;
+      }
+      .container {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 24px;
+      }
+      .header {
+        margin-bottom: 32px;
+        padding-bottom: 16px;
+        border-bottom: 2px solid #2a2a2a;
+      }
+      .logo {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        white-space: pre;
+        line-height: 1.05;
+        color: #ffd34d;
+        margin: 0 0 16px 0;
+        padding: 12px 16px;
+        border: 1px solid #2a2a2a;
+        border-radius: 6px;
+        background: #0f0f0f;
+        width: fit-content;
+      }
+      .logo-wrap {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 24px;
+      }
+      h1 {
+        margin: 0 0 8px 0;
+        font-size: 28px;
+        color: #ffd34d;
+      }
+      h2 {
+        margin: 32px 0 16px 0;
+        font-size: 22px;
+        color: #ffd34d;
+        border-bottom: 1px solid #2a2a2a;
+        padding-bottom: 8px;
+      }
+      h3 {
+        margin: 24px 0 12px 0;
+        font-size: 18px;
+        color: #f3f3f3;
+      }
+      .back-link {
+        display: inline-block;
+        margin-top: 16px;
+        color: #ffd34d;
+        text-decoration: none;
+        font-size: 14px;
+      }
+      .back-link:hover {
+        text-decoration: underline;
+      }
+      .content {
+        font-size: 16px;
+      }
+      .content p {
+        margin: 16px 0;
+      }
+      .content ul, .content ol {
+        margin: 16px 0;
+        padding-left: 24px;
+      }
+      .content li {
+        margin: 8px 0;
+      }
+      .content a {
+        color: #ffd34d;
+        text-decoration: none;
+      }
+      .content a:hover {
+        text-decoration: underline;
+      }
+      .section {
+        margin-bottom: 40px;
+        padding: 24px;
+        border: 1px solid #2a2a2a;
+        border-radius: 8px;
+        background: #111;
+      }
+      .screenshot {
+        margin: 24px 0;
+        text-align: center;
+      }
+      .screenshot img {
+        max-width: 100%;
+        height: auto;
+        border: 2px solid #2a2a2a;
+        border-radius: 6px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+      }
+      .screenshot-caption {
+        margin-top: 8px;
+        font-size: 13px;
+        color: #888;
+        font-style: italic;
+      }
+      .feature-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 16px;
+        margin: 24px 0;
+      }
+      .feature-box {
+        padding: 16px;
+        border: 1px solid #2a2a2a;
+        border-radius: 6px;
+        background: #0f0f0f;
+      }
+      .feature-box h4 {
+        margin: 0 0 8px 0;
+        color: #ffd34d;
+        font-size: 16px;
+      }
+      .feature-box p {
+        margin: 0;
+        font-size: 14px;
+        color: #ccc;
+      }
+      .footer {
+        margin-top: 48px;
+        padding-top: 24px;
+        border-top: 1px solid #2a2a2a;
+        text-align: center;
+        color: #888;
+        font-size: 13px;
+      }
+      .footer a {
+        color: #ffd34d;
+        text-decoration: none;
+      }
+      .footer a:hover {
+        text-decoration: underline;
+      }
+      .highlight {
+        background: rgba(255, 211, 77, 0.1);
+        padding: 2px 6px;
+        border-radius: 3px;
+        color: #ffd34d;
+      }
+      @media (max-width: 768px) {
+        .container {
+          padding: 16px;
+        }
+        .feature-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <div class="logo-wrap">
+          <pre class="logo">░█▀█░█▀▄░█▀█░█░█░▀█▀
+░█▀█░█▀▄░█░█░█░█░░█░
+░▀░▀░▀▀░░▀▀▀░▀▀▀░░▀</pre>
+        </div>
+        <h1>About Ceefax Station</h1>
+        <a href="/" class="back-link">← Back to Tracker</a>
+      </div>
+
+      <div class="content">
+        <div class="section">
+          <h2>What is Ceefax Station?</h2>
+          <p>
+            <strong>Ceefax Station</strong> is a modern recreation of the classic <a href="https://en.wikipedia.org/wiki/Ceefax" target="_blank" rel="noopener noreferrer">Ceefax</a> teletext service that ran on BBC television from 1974 until 2012. Just like the original, Ceefax Station delivers information in a distinctive blocky, colorful format that was iconic of the 1970s and 1980s.
+          </p>
+          <p>
+            But Ceefax Station goes beyond nostalgia—it brings teletext into the modern era by combining the classic visual style with:
+          </p>
+          <ul>
+            <li><strong>Live data feeds</strong> - Real-time weather, news, sports scores, and more</li>
+            <li><strong>Amateur radio transmission</strong> - Broadcast pages over the airwaves using <a href="https://en.wikipedia.org/wiki/AX.25" target="_blank" rel="noopener noreferrer">AX.25 packet radio</a></li>
+            <li><strong>Web tracking</strong> - See which stations are transmitting and receiving on an interactive map</li>
+            <li><strong>Cross-platform compatibility</strong> - Runs on Windows with a terminal-based viewer</li>
+          </ul>
+        </div>
+
+        <div class="section">
+          <h2>The Original Ceefax</h2>
+          <p>
+            <a href="https://en.wikipedia.org/wiki/Ceefax" target="_blank" rel="noopener noreferrer">Ceefax</a> (an acronym for "See Facts") was the world's first teletext service, launched by the BBC in 1974. It allowed viewers to access text-based information pages by pressing buttons on their TV remote control. These pages were broadcast as part of the television signal and displayed over the TV picture.
+          </p>
+          <p>
+            Teletext pages had a distinctive look: blocky 40-column text, limited color palette (typically 8 colors), and simple graphics made from text characters. Despite these limitations, Ceefax became incredibly popular, providing news, weather, sports scores, TV listings, and even simple games to millions of viewers.
+          </p>
+          <div class="screenshot">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Ceefax_weather_page.jpg/800px-Ceefax_weather_page.jpg" alt="1970s BBC Ceefax weather page" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+            <div class="screenshot-caption" style="display:none;">
+              <em>Example: A typical Ceefax weather page from the 1970s. The distinctive blocky text and limited color palette are characteristic of the teletext format.</em>
+            </div>
+            <div class="screenshot-caption">
+              <em>Example: A typical Ceefax weather page from the 1970s. The distinctive blocky text and limited color palette are characteristic of the teletext format.</em>
+              <br><small>Image: <a href="https://en.wikipedia.org/wiki/Ceefax" target="_blank" rel="noopener noreferrer">Wikipedia - Ceefax</a></small>
+            </div>
+          </div>
+          <p>
+            Learn more about the history of teletext:
+          </p>
+          <ul>
+            <li><a href="https://en.wikipedia.org/wiki/Ceefax" target="_blank" rel="noopener noreferrer">Ceefax on Wikipedia</a></li>
+            <li><a href="https://en.wikipedia.org/wiki/Teletext" target="_blank" rel="noopener noreferrer">Teletext on Wikipedia</a></li>
+            <li><a href="https://en.wikipedia.org/wiki/World_System_Teletext" target="_blank" rel="noopener noreferrer">World System Teletext standard</a></li>
+          </ul>
+        </div>
+
+        <div class="section">
+          <h2>How Ceefax Station Works</h2>
+          <h3>1. Page Generation</h3>
+          <p>
+            Ceefax Station automatically fetches live data from various sources (weather APIs, news feeds, sports data) and formats it into authentic-looking teletext pages. Each page follows the classic 40-column, 24-row format with the same color restrictions and character set as the original.
+          </p>
+
+          <h3>2. Transmission (TX Mode)</h3>
+          <p>
+            When you're ready to broadcast, Ceefax Station converts the pages into <a href="https://en.wikipedia.org/wiki/AX.25" target="_blank" rel="noopener noreferrer">AX.25</a> packet radio format and modulates them using <a href="https://en.wikipedia.org/wiki/Frequency-shift_keying" target="_blank" rel="noopener noreferrer">AFSK1200</a> (Audio Frequency Shift Keying). This creates an audio signal that can be transmitted over amateur radio frequencies using a standard radio transceiver.
+          </p>
+          <p>
+            The system supports multiple amateur radio bands including:
+          </p>
+          <ul>
+            <li><strong>HF bands:</strong> 80m, 40m, 30m, 20m, 17m, 15m, 12m, 10m</li>
+            <li><strong>VHF bands:</strong> 6m, 2m</li>
+            <li><strong>UHF bands:</strong> 70cm</li>
+          </ul>
+
+          <h3>3. Reception (RX Mode)</h3>
+          <p>
+            Other stations can receive your transmissions using their radio equipment. Ceefax Station includes a receiver mode that uses <a href="https://github.com/wb2osz/direwolf" target="_blank" rel="noopener noreferrer">Dire Wolf</a> to decode the AX.25 packets and reconstruct the teletext pages. Received pages are automatically saved and can be viewed in the terminal-based viewer.
+          </p>
+
+          <h3>4. Web Tracking</h3>
+          <p>
+            All transmission and reception activity is logged and can be uploaded to <a href="https://ceefaxstation.com" target="_blank" rel="noopener noreferrer">ceefaxstation.com</a>, where it's displayed on an interactive map. You can see:
+          </p>
+          <ul>
+            <li>Which stations are transmitting and receiving</li>
+            <li>Links between stations (who received whose transmissions)</li>
+            <li>Page transmission and reception statistics</li>
+            <li>Station locations using <a href="https://en.wikipedia.org/wiki/Maidenhead_Locator_System" target="_blank" rel="noopener noreferrer">Maidenhead grid squares</a></li>
+          </ul>
+        </div>
+
+        <div class="section">
+          <h2>Key Features</h2>
+          <div class="feature-grid">
+            <div class="feature-box">
+              <h4>📺 Authentic Teletext Pages</h4>
+              <p>Weather, news, sports, entertainment, and more—all in the classic Ceefax style</p>
+            </div>
+            <div class="feature-box">
+              <h4>📡 Packet Radio Support</h4>
+              <p>Transmit and receive pages over amateur radio using AX.25 protocol</p>
+            </div>
+            <div class="feature-box">
+              <h4>🌐 Live Data Feeds</h4>
+              <p>Real-time weather, news headlines, sports scores, and exchange rates</p>
+            </div>
+            <div class="feature-box">
+              <h4>🗺️ Interactive Web Map</h4>
+              <p>Track stations and transmissions on a public website</p>
+            </div>
+            <div class="feature-box">
+              <h4>⌨️ Terminal Interface</h4>
+              <p>Classic terminal-based viewer with keyboard navigation (just like the original)</p>
+            </div>
+            <div class="feature-box">
+              <h4>🔄 Automatic Updates</h4>
+              <p>Pages refresh automatically with the latest data</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>Getting Started</h2>
+          <p>
+            To get started with Ceefax Station, you'll need:
+          </p>
+          <ol>
+            <li><strong>Amateur radio license</strong> - Required for transmitting on amateur radio frequencies</li>
+            <li><strong>Radio equipment</strong> - A transceiver capable of operating on your chosen band</li>
+            <li><strong>Audio interface</strong> - To connect your computer to your radio (sound card or USB interface)</li>
+            <li><strong>Windows computer</strong> - Ceefax Station runs on Windows</li>
+          </ol>
+          <p>
+            Once set up, you can:
+          </p>
+          <ul>
+            <li>View pages locally in debug mode</li>
+            <li>Transmit pages over the airwaves</li>
+            <li>Receive pages from other stations</li>
+            <li>Upload your logs to the web tracker</li>
+          </ul>
+          <p>
+            For detailed installation and setup instructions, visit the <a href="https://github.com/thaum-labs/ceefax_station" target="_blank" rel="noopener noreferrer">GitHub repository</a>.
+          </p>
+        </div>
+
+        <div class="section">
+          <h2>Technical Details</h2>
+          <p>
+            Ceefax Station is built with:
+          </p>
+          <ul>
+            <li><strong>Python 3.11</strong> - Core application language</li>
+            <li><strong>AX.25</strong> - Packet radio protocol for transmission</li>
+            <li><strong>AFSK1200</strong> - Audio modulation scheme</li>
+            <li><strong>Dire Wolf</strong> - AX.25 decoder for reception</li>
+            <li><strong>FastAPI</strong> - Web server for the tracker</li>
+            <li><strong>Leaflet.js</strong> - Interactive map visualization</li>
+          </ul>
+          <p>
+            The teletext pages follow the <a href="https://en.wikipedia.org/wiki/World_System_Teletext" target="_blank" rel="noopener noreferrer">World System Teletext</a> standard, ensuring compatibility with original teletext decoders where possible.
+          </p>
+        </div>
+
+        <div class="section">
+          <h2>Community & Support</h2>
+          <p>
+            Ceefax Station is an open-source project created by <strong>M7TJF</strong>. The project is available on GitHub where you can:
+          </p>
+          <ul>
+            <li>Download the latest version</li>
+            <li>Report bugs or request features</li>
+            <li>Contribute code improvements</li>
+            <li>View the changelog and documentation</li>
+          </ul>
+          <p>
+            Visit the <a href="https://github.com/thaum-labs/ceefax_station" target="_blank" rel="noopener noreferrer">GitHub repository</a> to get involved.
+          </p>
+        </div>
+      </div>
+
+      <div class="footer">
+        <div>Created by <strong>M7TJF</strong> · Ceefax Station © <span id="year"></span></div>
+        <div style="margin-top: 8px;">
+          <a href="https://github.com/thaum-labs/ceefax_station" target="_blank" rel="noopener noreferrer">GitHub Repository</a> · 
+          <a href="/changelog">Changelog</a>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Footer year
+      document.getElementById('year').textContent = String(new Date().getFullYear());
+    </script>
+  </body>
+</html>
+

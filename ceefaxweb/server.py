@@ -104,6 +104,14 @@ def create_app() -> FastAPI:
         html = changelog_path.read_text(encoding="utf-8")
         return HTMLResponse(content=html, headers=_NO_CACHE_HEADERS)
 
+    @app.get("/about", response_class=HTMLResponse)
+    def about() -> HTMLResponse:
+        about_path = static_dir / "about.html"
+        if not about_path.exists():
+            raise HTTPException(status_code=404, detail="About page not found")
+        html = about_path.read_text(encoding="utf-8")
+        return HTMLResponse(content=html, headers=_NO_CACHE_HEADERS)
+
     app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
 
     @app.get("/api/map")
