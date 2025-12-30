@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import random
 import uuid
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -32,6 +33,9 @@ def build_sample(
     generated_at: datetime,
     pages: list[str],
     rx_ok_pages: list[str],
+    tx_frequency: str | None = None,
+    rx_frequency: str | None = None,
+    rx_db: float | None = None,
 ) -> tuple[dict[str, Any], dict[str, Any]]:
     tx_id = str(uuid.uuid4())
     tx = {
@@ -41,6 +45,7 @@ def build_sample(
         "station_callsign": tx_callsign,
         "station_grid": tx_grid,
         "dest_callsign": "CEEFAX",
+        "frequency": tx_frequency,
         "wav_name": f"sample_{tx_callsign}_{generated_at.strftime('%Y%m%d_%H%M%S')}.wav",
         "generated_at": generated_at.isoformat(),
         "loops": 1,
@@ -60,12 +65,18 @@ def build_sample(
                 sub_i = 1
         else:
             page, sub_i = pid, 1
+        # Add per-page dB (slightly vary around the base rx_db)
+        page_db = rx_db
+        if page_db is not None:
+            page_db = page_db + random.uniform(-2.0, 2.0)
         pages_decoded[f"{tx_id}:{pid}"] = {
             "tx_id": tx_id,
             "page": page,
             "subpage": sub_i,
             "title": "Sample",
             "first_complete_rx_s": 1.0,
+            "rx_db": page_db,
+            "frequency": rx_frequency,
         }
 
     rx = {
@@ -85,6 +96,8 @@ def build_sample(
         "pages_seen_count": len(pages),
         "partial_page_count": max(0, len(pages) - len(rx_ok_pages)),
         "complete_by_progress_count": len(rx_ok_pages),
+        "frequency": rx_frequency,
+        "rx_db": rx_db,
         "updated_at": _iso(generated_at + timedelta(minutes=2)),
     }
 
@@ -100,20 +113,32 @@ def main() -> int:
 
     now = datetime.now(timezone.utc)
     # 6 stations: 2 transmitting, 4 listening
-    # TX stations: M7TJF, G4ABC
+    # TX stations: M7TJF (10m), G4ABC (2m)
     # RX stations: M0XYZ, G8DEF, G9GHI, M1JKL
+    # Some stations receive from both transmitters
+    
+    # Frequency definitions
+    freq_10m = "10m (28.0-29.7 MHz)"
+    freq_2m = "2m (144.0-148.0 MHz)"
+    
+    # Sample data with frequency and dB information
+    # Format: (tx_callsign, tx_grid, rx_callsign, rx_grid, tx_freq, rx_freq, rx_db)
     samples = [
-        # TX -> RX with some loss
-        ("M7TJF", "IO91WM", "M0XYZ", "IO83PR"),  # TX1 -> RX1 (receives some pages)
-        ("M7TJF", "IO91WM", "G8DEF", "IO92AB"),  # TX1 -> RX2 (receives some pages)
-        ("G4ABC", "IO91VW", "G9GHI", "IO93CD"),   # TX2 -> RX3 (receives some pages)
-        ("G4ABC", "IO91VW", "M1JKL", "IO94EF"),   # TX2 -> RX4 (receives some pages)
+        # M7TJF (10m) transmissions
+        ("M7TJF", "IO91WM", "M0XYZ", "IO83PR", freq_10m, freq_10m, -12.5),  # TX1 (10m) -> RX1
+        ("M7TJF", "IO91WM", "G8DEF", "IO92AB", freq_10m, freq_10m, -14.2),  # TX1 (10m) -> RX2
+        ("M7TJF", "IO91WM", "G9GHI", "IO93CD", freq_10m, freq_10m, -15.8),  # TX1 (10m) -> RX3 (also receives from G4ABC)
+        
+        # G4ABC (2m) transmissions
+        ("G4ABC", "IO91VW", "G9GHI", "IO93CD", freq_2m, freq_2m, -11.3),   # TX2 (2m) -> RX3 (also receives from M7TJF)
+        ("G4ABC", "IO91VW", "M1JKL", "IO94EF", freq_2m, freq_2m, -13.7),   # TX2 (2m) -> RX4
+        ("G4ABC", "IO91VW", "M0XYZ", "IO83PR", freq_2m, freq_2m, -16.1),   # TX2 (2m) -> RX1 (also receives from M7TJF)
     ]
     
     # Listening-only stations (no reception)
     listening_only = [
-        ("G8DEF", "IO92AB"),  # RX2 also listening independently
-        ("G9GHI", "IO93CD"),  # RX3 also listening independently
+        ("G8DEF", "IO92AB", freq_10m),  # RX2 also listening independently on 10m
+        ("M1JKL", "IO94EF", freq_2m),   # RX4 also listening independently on 2m
     ]
 
     pages = ["200", "300", "301", "402", "503", "503.2", "600"]
@@ -124,9 +149,9 @@ def main() -> int:
 
     server = (args.ingest or "").rstrip("/") if args.ingest else None
 
-    for i, (tx_cs, tx_grid, rx_cs, rx_grid) in enumerate(samples):
+    for i, (tx_cs, tx_grid, rx_cs, rx_grid, tx_freq, rx_freq, rx_db) in enumerate(samples):
         gen_at = now - timedelta(hours=1 + i)
-        rx_ok = pages[: max(2, len(pages) - (i + 1))]  # progressively worse reception
+        rx_ok = pages[: max(2, len(pages) - (i % 3))]  # vary reception quality
         tx, rx = build_sample(
             tx_callsign=tx_cs,
             tx_grid=tx_grid,
@@ -135,6 +160,9 @@ def main() -> int:
             generated_at=gen_at,
             pages=pages,
             rx_ok_pages=rx_ok,
+            tx_frequency=tx_freq,
+            rx_frequency=rx_freq,
+            rx_db=rx_db,
         )
 
         if args.write:
@@ -156,7 +184,7 @@ def main() -> int:
                 r.raise_for_status()
     
     # Create listening-only logs (no reception)
-    for rx_cs, rx_grid in listening_only:
+    for rx_cs, rx_grid, freq in listening_only:
         gen_at = now - timedelta(minutes=30)
         rx_listening = {
             "schema": 1,
@@ -166,6 +194,8 @@ def main() -> int:
             "rx_mode": "live",
             "started_at": _iso(gen_at),
             "updated_at": _iso(gen_at + timedelta(minutes=5)),
+            "frequency": freq,
+            "rx_db": None,
             "station_callsign": None,
             "tx_id": None,
             "tx_ids_seen": [],
