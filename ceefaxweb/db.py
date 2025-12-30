@@ -213,8 +213,9 @@ def ingest_log(
         conn.commit()
         return (True, "tx_ingested")
 
-    # RX report (schema 1, has pages_decoded + listener_callsign)
-    if payload.get("schema") == 1 and payload.get("listener_callsign") and payload.get("pages_decoded"):
+    # RX report (schema 1, has listener_callsign)
+    # Support both: RX with pages_decoded, and listening-only (empty pages_decoded)
+    if payload.get("schema") == 1 and payload.get("listener_callsign"):
         rx_cs = str(payload.get("listener_callsign")).strip().upper()
         tx_cs = str(payload.get("station_callsign") or "").strip().upper() or None
         started = _parse_iso(str(payload.get("started_at") or "")) or _parse_iso(str(payload.get("updated_at") or "")) or datetime.now(timezone.utc)
@@ -225,6 +226,7 @@ def ingest_log(
         except Exception:  # noqa: BLE001
             rx_db_top_f = None
 
+        # Always register the listening station, even if no pages decoded
         upsert_station(
             conn,
             callsign=rx_cs,
@@ -236,8 +238,9 @@ def ingest_log(
         if tx_cs:
             upsert_station(conn, callsign=tx_cs, grid=station_grid)
 
+        # Process pages_decoded if present
         pages_decoded = payload.get("pages_decoded") or {}
-        if isinstance(pages_decoded, dict):
+        if isinstance(pages_decoded, dict) and len(pages_decoded) > 0:
             for k, v in pages_decoded.items():
                 if not isinstance(v, dict):
                     continue
@@ -271,7 +274,11 @@ def ingest_log(
                     (rx_cs, tx_cs, tx_id, rx_at_iso, page_id, freq, rx_db),
                 )
         conn.commit()
-        return (True, "rx_ingested")
+        # Return different reason for listening-only vs receiving
+        if pages_decoded and len(pages_decoded) > 0:
+            return (True, "rx_ingested")
+        else:
+            return (True, "rx_listening_only")
 
     conn.commit()
     return (True, "log_saved_no_derivation")
