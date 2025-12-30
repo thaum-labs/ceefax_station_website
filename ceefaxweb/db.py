@@ -315,6 +315,7 @@ def query_map(conn: sqlite3.Connection, *, range_key: str, band_filter: str = ""
 
     # Links: join RX to TX counts over time window.
     # Filter by band if specified (check both TX and RX frequencies)
+    # Important: Show link if ANY reception matches the band, even if TX frequency differs
     link_query = """
         SELECT
           r.tx_callsign AS tx_callsign,
@@ -327,11 +328,11 @@ def query_map(conn: sqlite3.Connection, *, range_key: str, band_filter: str = ""
     """
     link_params: list[Any] = [since]
     if freq_pattern:
-        # Show link if either reception or transmission frequency matches the selected band
-        # Use COALESCE to handle NULLs: if r.freq is NULL, use t.freq; if both NULL, use empty string
-        # This ensures the LIKE check works correctly even when one frequency is missing
-        link_query += " AND (COALESCE(r.freq, t.freq, '') LIKE ? OR COALESCE(t.freq, r.freq, '') LIKE ?)"
-        link_params.extend([freq_pattern, freq_pattern])
+        # Show link if reception frequency OR transmission frequency matches the selected band
+        # Prioritize r.freq (reception frequency) as it's more reliable for filtering
+        # If r.freq is NULL, fall back to t.freq
+        link_query += " AND (r.freq LIKE ? OR (r.freq IS NULL AND t.freq LIKE ?) OR t.freq LIKE ?)"
+        link_params.extend([freq_pattern, freq_pattern, freq_pattern])
     link_query += " GROUP BY r.tx_callsign, r.rx_callsign"
     
     links = [
