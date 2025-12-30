@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import sys
 import time
 from pathlib import Path
 from typing import Any
@@ -10,6 +11,23 @@ import requests
 
 
 def _repo_root() -> Path:
+    """Get repository root, handling both development and PyInstaller bundle."""
+    if getattr(sys, 'frozen', False):
+        # Running as PyInstaller bundle
+        # In PyInstaller, the executable is in the app directory
+        # Data files are extracted to sys._MEIPASS
+        exe_dir = Path(sys.executable).parent
+        # Check if we're in a standard installation (Program Files)
+        if (exe_dir / "ceefax").exists():
+            return exe_dir
+        # Otherwise, data is in _MEIPASS during extraction
+        if hasattr(sys, '_MEIPASS'):
+            meipass = Path(sys._MEIPASS)
+            # Data files are extracted to _MEIPASS root
+            if (meipass / "ceefax").exists():
+                return meipass
+        return exe_dir
+    # Development mode
     return Path(__file__).resolve().parent.parent
 
 
