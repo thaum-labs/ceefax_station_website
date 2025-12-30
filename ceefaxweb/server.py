@@ -84,16 +84,25 @@ def create_app() -> FastAPI:
 
     static_dir = Path(__file__).resolve().parent / "static"
 
+    _NO_CACHE_HEADERS = {
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        "Pragma": "no-cache",
+        "Expires": "0",
+    }
+
     @app.get("/", response_class=HTMLResponse)
-    def index() -> str:
-        return (static_dir / "index.html").read_text(encoding="utf-8")
+    def index() -> HTMLResponse:
+        # Avoid browsers/proxies caching the UI HTML (helps users see updates immediately).
+        html = (static_dir / "index.html").read_text(encoding="utf-8")
+        return HTMLResponse(content=html, headers=_NO_CACHE_HEADERS)
 
     @app.get("/changelog", response_class=HTMLResponse)
-    def changelog() -> str:
+    def changelog() -> HTMLResponse:
         changelog_path = static_dir / "changelog.html"
         if not changelog_path.exists():
             raise HTTPException(status_code=404, detail="Changelog page not found")
-        return changelog_path.read_text(encoding="utf-8")
+        html = changelog_path.read_text(encoding="utf-8")
+        return HTMLResponse(content=html, headers=_NO_CACHE_HEADERS)
 
     app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
 
