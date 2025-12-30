@@ -46,6 +46,23 @@ A modern recreation of the classic Ceefax teletext service, running on Windows w
 
 ### Installation
 
+You have two options for installing Ceefax Station:
+
+#### Option 1: Windows Installer (Recommended for most users)
+
+1. Download the latest installer from the `installers/` directory in this repository:
+   - Latest: `installers/CeefaxStation-Setup-0.1.0.exe`
+
+2. Run the installer and follow the setup wizard
+
+3. Configure your station:
+   - After installation, edit `C:\Program Files\Ceefax Station\ceefax\radio_config.json` (or use the "Configure Station" shortcut from the Start menu)
+   - Set your callsign, frequency, and grid square
+
+**Note:** The installer may be behind the latest code available on GitHub. For the most up-to-date version, use Option 2 below.
+
+#### Option 2: Manual Installation (Latest code from Git)
+
 1. Clone the repository:
 ```bash
 git clone https://github.com/thaum-labs/ceefax_station.git
