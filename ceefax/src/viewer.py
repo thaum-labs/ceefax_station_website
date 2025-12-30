@@ -1065,10 +1065,15 @@ def _draw_ascii_progress_bar(stdscr: "curses._CursesWindow", row: int, col: int,
     else:
         full_text = f"{bar}{percent_str}"
     
-    # Truncate to fit screen
+    # Truncate to fit screen and ensure it doesn't exceed available space
     max_width = screen_width - col - 1
     if len(full_text) > max_width:
-        full_text = full_text[:max_width]
+        # If too long, truncate the label first, then the bar
+        if label and len(label) > 5:
+            label_short = label[:max_width - len(bar) - len(percent_str) - 1]
+            full_text = f"{label_short} {bar}{percent_str}"
+        else:
+            full_text = full_text[:max_width]
     
     try:
         stdscr.addstr(row, col, full_text[:max_width])
@@ -1185,11 +1190,22 @@ def _draw_tx_screen(stdscr: "curses._CursesWindow", status: str, progress: float
         stdscr.addstr(row, inner_x, status_text[:inner_width], body_attr | curses.A_BOLD)
         row += 2
     
-    # Add progress bar (centered)
+    # Add progress bar (centered, ensure it fits within inner_width)
     if progress_label:
         row += 1
-        bar_width = min(40, inner_width - 4)
-        bar_x = inner_x + (inner_width - bar_width) // 2
+        # Calculate max bar width to fit within inner_width
+        # Progress bar format: "Label [====>     ] XX%"
+        # Need: label + space + "[" + bar + "]" + space + "100%" = label_len + 1 + 1 + bar_width + 1 + 1 + 4
+        label_len = len(progress_label)
+        # Reserve space for: label + space + brackets (2) + space + "100%" (4) + padding (2)
+        reserved = label_len + 1 + 2 + 1 + 4 + 2
+        max_bar_chars = max(10, inner_width - reserved)
+        bar_width = min(40, max_bar_chars)
+        # Center the entire progress bar text within inner_width
+        estimated_full_len = label_len + 1 + 2 + bar_width + 1 + 1 + 4  # label + space + [ + bar + ] + space + %
+        bar_x = inner_x + (inner_width - estimated_full_len) // 2
+        # Ensure bar_x doesn't go outside inner area
+        bar_x = max(inner_x, min(bar_x, inner_x + inner_width - estimated_full_len))
         _draw_ascii_progress_bar(stdscr, row, bar_x, bar_width, progress, progress_label)
         row += 2
     
@@ -1600,11 +1616,49 @@ def _tx_mode_loop(stdscr: "curses._CursesWindow", pages: List[Page]) -> None:
             
             # Run playback in background thread so we can check for ESC
             playback_done = threading.Event()
+            playback_stop = threading.Event()
             playback_err: dict = {"err": None}
+            playback_proc = {"proc": None}  # Store subprocess for termination
             
             def _playback_worker() -> None:
                 try:
-                    play_wav_file(wav, loops=1)
+                    import subprocess
+                    import sys
+                    if sys.platform.startswith("win"):
+                        # On Windows, use PowerShell subprocess so we can terminate it
+                        try:
+                            # Escape the path for PowerShell
+                            wav_escaped = wav.replace("'", "''")
+                            proc = subprocess.Popen(
+                                ["powershell", "-Command", f"(New-Object Media.SoundPlayer '{wav_escaped}').PlaySync()"],
+                                stdout=subprocess.PIPE,
+                                stderr=subprocess.PIPE,
+                                creationflags=subprocess.CREATE_NO_WINDOW if hasattr(subprocess, 'CREATE_NO_WINDOW') else 0
+                            )
+                            playback_proc["proc"] = proc
+                            proc.wait()
+                        except Exception as e:  # noqa: BLE001
+                            # Fallback to winsound if PowerShell fails
+                            import winsound
+                            # Use async mode and poll for stop
+                            winsound.PlaySound(wav, winsound.SND_FILENAME | winsound.SND_ASYNC)
+                            # Poll until stop is requested or sound finishes (rough estimate)
+                            import time
+                            import os
+                            # Estimate duration from file size (rough: 1 second per ~96KB for 16-bit 48kHz mono)
+                            try:
+                                file_size = os.path.getsize(wav)
+                                estimated_duration = file_size / (48000 * 2)  # 48kHz, 16-bit (2 bytes)
+                            except Exception:
+                                estimated_duration = 30  # Default fallback
+                            
+                            elapsed = 0.0
+                            while elapsed < estimated_duration and not playback_stop.is_set():
+                                time.sleep(0.1)
+                                elapsed += 0.1
+                    else:
+                        # For non-Windows, use the original play_wav_file
+                        play_wav_file(wav, loops=1)
                 except Exception as e:  # noqa: BLE001
                     playback_err["err"] = e
                 finally:
@@ -1617,13 +1671,24 @@ def _tx_mode_loop(stdscr: "curses._CursesWindow", pages: List[Page]) -> None:
             while not playback_done.is_set():
                 ch = stdscr.getch()
                 if ch == 27:  # ESC
+                    # Stop playback
+                    playback_stop.set()
+                    if playback_proc["proc"]:
+                        try:
+                            playback_proc["proc"].terminate()
+                            playback_proc["proc"].wait(timeout=0.5)
+                        except Exception:  # noqa: BLE001
+                            try:
+                                playback_proc["proc"].kill()
+                            except Exception:  # noqa: BLE001
+                                pass
                     _draw_tx_screen(
                         stdscr,
                         "Transmission cancelled",
                         progress,
                         f"Transmission {tx_num}/3",
                         "",
-                        "Returning to viewer. Playback may continue in background.",
+                        "Returning to viewer.",
                     )
                     stdscr.refresh()
                     time.sleep(1.0)
