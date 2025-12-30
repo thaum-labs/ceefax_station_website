@@ -1367,6 +1367,20 @@ def _tx_mode_loop(stdscr: "curses._CursesWindow", pages: List[Page]) -> None:
         
         # Simulate progress during generation (actual generation is fast)
         for i in range(10):
+            ch = stdscr.getch()
+            if ch == 27:  # ESC
+                _draw_tx_screen(
+                    stdscr,
+                    "Generation cancelled",
+                    0.0,
+                    "Generating",
+                    "",
+                    "Returning to viewer.",
+                )
+                stdscr.refresh()
+                time.sleep(1.0)
+                return  # Exit TX mode immediately
+            
             _draw_tx_screen(stdscr, "Generating transmission file...", i / 10.0, "Generating")
             stdscr.refresh()
             time.sleep(0.05)
@@ -1396,20 +1410,50 @@ def _tx_mode_loop(stdscr: "curses._CursesWindow", pages: List[Page]) -> None:
             _draw_tx_screen(stdscr, status, progress, f"Transmission {tx_num}/3")
             stdscr.refresh()
             
-            try:
-                # Play the WAV file (blocking call)
-                play_wav_file(wav, loops=1)
-                
+            # Run playback in background thread so we can check for ESC
+            playback_done = threading.Event()
+            playback_err: dict = {"err": None}
+            
+            def _playback_worker() -> None:
+                try:
+                    play_wav_file(wav, loops=1)
+                except Exception as e:  # noqa: BLE001
+                    playback_err["err"] = e
+                finally:
+                    playback_done.set()
+            
+            t_playback = threading.Thread(target=_playback_worker, daemon=True)
+            t_playback.start()
+            
+            # Poll for ESC while playback runs
+            while not playback_done.is_set():
+                ch = stdscr.getch()
+                if ch == 27:  # ESC
+                    _draw_tx_screen(
+                        stdscr,
+                        "Transmission cancelled",
+                        progress,
+                        f"Transmission {tx_num}/3",
+                        "",
+                        "Returning to viewer. Playback may continue in background.",
+                    )
+                    stdscr.refresh()
+                    time.sleep(1.0)
+                    return  # Exit TX mode immediately
+                time.sleep(0.1)  # Small delay to avoid busy-waiting
+            
+            # Check if playback had an error
+            if playback_err["err"] is not None:
+                progress = tx_num / 3.0
+                _draw_tx_screen(stdscr, f"Transmission {tx_num}/3 failed: {str(playback_err['err'])[:40]}", progress, f"Transmission {tx_num}/3")
+                stdscr.refresh()
+                time.sleep(2)
+            else:
                 # Show completion
                 progress = tx_num / 3.0
                 _draw_tx_screen(stdscr, f"Transmission {tx_num}/3 complete", progress, f"Transmission {tx_num}/3")
                 stdscr.refresh()
                 time.sleep(0.3)
-            except Exception as e:  # noqa: BLE001
-                progress = tx_num / 3.0
-                _draw_tx_screen(stdscr, f"Transmission {tx_num}/3 failed: {str(e)[:40]}", progress, f"Transmission {tx_num}/3")
-                stdscr.refresh()
-                time.sleep(2)
         
         # Step 4: Show countdown and website message
         message = "Visit https://ceefaxstation.com to see your station on the map and view reception data"
