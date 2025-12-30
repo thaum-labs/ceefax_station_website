@@ -483,7 +483,6 @@
 
       // Load version on page load
       const versionDisplay = document.getElementById('versionDisplay');
-      const versionDisplayInline = document.getElementById('versionDisplayInline');
       (async () => {
         try {
           const res = await fetch('/api/version');
@@ -494,9 +493,6 @@
                          version.includes('-beta') ? 'beta' : 'release';
             const versionText = `v${version}${stage !== 'release' ? ` (${stage})` : ''}`;
             versionDisplay.textContent = versionText;
-            if (versionDisplayInline) {
-              versionDisplayInline.textContent = versionText;
-            }
           }
         } catch (err) {
           console.error('Failed to load version:', err);
