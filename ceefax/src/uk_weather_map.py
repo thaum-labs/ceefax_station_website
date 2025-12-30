@@ -1,7 +1,7 @@
 from typing import List, Dict, Tuple
 
 from .compiler import PAGE_WIDTH, PAGE_HEIGHT
-from .weather_map import fetch_wttr, WeatherSummary
+from .weather_map import WeatherSummary, fetch_wttr_many
 
 
 # Rough UK "map" layout positions (row, col) for each city label
@@ -49,15 +49,15 @@ def build_uk_weather_map() -> List[str]:
     title = "UK WEATHER FOR TONIGHT"
     _put_text(buf, 0, 0, title.center(PAGE_WIDTH))
 
-    # Fetch summaries for each region with error handling
+    # Fetch summaries for each region in parallel (major speedup)
+    queries = [q for (q, _row, _col) in REGIONS.values()]
+    fetched = fetch_wttr_many(queries, max_workers=6)
+
+    # Map back to region keys + apply fallback if missing
     summaries: Dict[str, WeatherSummary] = {}
     for name, (query, _row, _col) in REGIONS.items():
-        try:
-            summaries[name] = fetch_wttr(query)
-        except Exception as e:
-            # Create a fallback summary if fetch fails
-            from .weather_map import WeatherSummary
-            print(f"Warning: Failed to fetch weather for {name} ({query}): {e}")
+        s = fetched.get(query) or fetched.get(query.replace(",GB", ",UK"))
+        if s is None:
             summaries[name] = WeatherSummary(
                 location=name,
                 temp_c="?",
@@ -67,6 +67,8 @@ def build_uk_weather_map() -> List[str]:
                 wind_dir="?",
                 icon="☁",
             )
+        else:
+            summaries[name] = s
 
     # ASCII-art UK outline used as background (from asciiart.website),
     # centred horizontally to fit PAGE_WIDTH.

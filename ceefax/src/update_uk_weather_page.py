@@ -5,10 +5,10 @@ Uses same format as page 101.
 """
 import json
 from pathlib import Path
-from typing import List, Tuple
+from typing import Dict, List, Tuple
 
 from .compiler import PAGE_WIDTH, PAGE_HEIGHT
-from .weather_map import fetch_wttr, WeatherSummary
+from .weather_map import WeatherSummary, fetch_wttr, fetch_wttr_many
 
 
 def _pad(text: str) -> str:
@@ -123,12 +123,13 @@ UK_CITIES_SUB = [
 ]
 
 
-def build_single_location_weather_page(name: str, query: str) -> List[str]:
+def build_single_location_weather_page(name: str, query: str, *, summary: WeatherSummary | None = None) -> List[str]:
     """Build a single location weather page with detailed forecast."""
     lines: List[str] = []
     
     try:
-        summary: WeatherSummary = fetch_wttr(query)
+        if summary is None:
+            summary = fetch_wttr(query)
         icon_lines = _ascii_icon(summary.description)
 
         # Centered title
@@ -204,10 +205,15 @@ def main() -> None:
 
     # Create one page per city - always start with London
     all_cities = UK_CITIES_MAIN + UK_CITIES_SUB
-    
+
+    # Prefetch all cities in parallel (major speedup vs serial requests)
+    queries = [q for _n, q in all_cities]
+    prefetched: Dict[str, WeatherSummary] = fetch_wttr_many(queries, max_workers=6)
+
     for idx, (name, query) in enumerate(all_cities, start=1):
         try:
-            page_lines = build_single_location_weather_page(name, query)
+            summary = prefetched.get(query) or prefetched.get(query.replace(",GB", ",UK"))
+            page_lines = build_single_location_weather_page(name, query, summary=summary)
             page_file = pages_dir / f"101{'_' + str(idx) if idx > 1 else ''}.json"
             page_data = {
                 "page": "101",
