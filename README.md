@@ -195,28 +195,6 @@ The project uses semantic versioning with alpha/beta/release stages:
 
 Version is stored in `VERSION` file and changelog in `CHANGELOG.json`.
 
-### Adding Changelog Entries
-Use the helper script to add changelog entries:
-```bash
-python scripts/add_changelog_entry.py "Change description 1" "Change description 2"
-```
-
-Options:
-- `--patch` (default): Increment patch version (0.1.0 → 0.1.1)
-- `--minor`: Increment minor version (0.1.0 → 0.2.0)
-- `--major`: Increment major version (0.1.0 → 1.0.0)
-- `--no-bump`: Add to today's entry without version bump
-
-Changes made on the same day are automatically grouped together.
-
-### Updating Pages
-Pages can be updated manually or via API update scripts in `ceefax/src/update_*.py`.
-
-### Adding New Pages
-1. Create a JSON file in `ceefax/pages/`
-2. Add entry to the index page (100.json)
-3. Update compiler if needed
-
 ## License
 
 MIT License - see [LICENSE](LICENSE) for details.
