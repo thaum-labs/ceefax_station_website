@@ -993,31 +993,31 @@ def _draw_page(
             stdscr.addstr(current_row, offset_x, line[:PAGE_WIDTH], body_attr)
             current_row += 1
 
-    # "Fastext" bar one line above bottom
-    fastext_y = max_y - 2
-    if fastext_y > offset_y + PAGE_HEIGHT:
-        # Center the fastext labels instead of left-aligning.
+    # Controls bar one line above bottom (replaces Fastext)
+    controls_y = max_y - 2
+    if controls_y > offset_y + PAGE_HEIGHT:
+        # Center the control labels instead of left-aligning.
         if curses.has_colors():
             labels = [
-                (" RED ", curses.color_pair(3) | curses.A_BOLD),
-                (" GREEN ", curses.color_pair(4) | curses.A_BOLD),
-                (" YELLOW ", curses.color_pair(5) | curses.A_BOLD),
-                (" BLUE ", curses.color_pair(6) | curses.A_BOLD),
+                (" r: RX ", curses.color_pair(3) | curses.A_BOLD),      # RED
+                (" t: TX ", curses.color_pair(4) | curses.A_BOLD),      # GREEN
+                (" F5: Reload ", curses.color_pair(5) | curses.A_BOLD), # YELLOW
+                (" ESC: Exit ", curses.color_pair(6) | curses.A_BOLD),  # BLUE
             ]
             total_len = sum(len(text) for text, _ in labels)
             x = max((max_x - 1 - total_len) // 2, 0)
             for text, attr in labels:
                 if x >= max_x - 1:
                     break
-                stdscr.addstr(fastext_y, x, text[: max_x - 1 - x], attr)
+                stdscr.addstr(controls_y, x, text[: max_x - 1 - x], attr)
                 x += len(text)
         else:
-            line = "RED  GREEN  YELLOW  BLUE"
+            line = "r: RX  t: TX  F5: Reload  ESC: Exit"
             x = max((max_x - 1 - len(line)) // 2, 0)
-            stdscr.addstr(fastext_y, x, line[: max_x - 1 - x])
+            stdscr.addstr(controls_y, x, line[: max_x - 1 - x])
 
     # Status line at bottom, centred horizontally to match header
-    status = f"Page {page.page_id}  ({index + 1}/{total})  n/p: next/prev  r: reload  q: quit"
+    status = f"Page {page.page_id}  ({index + 1}/{total})  n/p: next/prev  q: quit"
     status_line = status[: max_x - 1]
     pad_width = max_x - 1
     start_x = max((pad_width - len(status_line)) // 2, 0)
