@@ -2002,11 +2002,9 @@ def _rx_viewer_loop_live(
                     callsign_override=listener_callsign,
                 )
             else:
-                stdscr.clear()
+                # Show RX screen with waiting message
                 msg = rx_err["msg"] or "Waiting for AX.25 pages from live audio..."
-                stdscr.addstr(0, 0, msg[: max(stdscr.getmaxyx()[1] - 1, 1)])
-                stdscr.addstr(1, 0, "Press q to quit."[: max(stdscr.getmaxyx()[1] - 1, 1)])
-                stdscr.refresh()
+                _draw_rx_screen(stdscr, "Waiting for pages...", msg)
 
             ch = stdscr.getch()
             if ch in (ord("q"), ord("Q")):
