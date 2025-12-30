@@ -1193,19 +1193,28 @@ def _draw_tx_screen(stdscr: "curses._CursesWindow", status: str, progress: float
     # Add progress bar (centered, ensure it fits within inner_width)
     if progress_label:
         row += 1
-        # Calculate max bar width to fit within inner_width
+        # Calculate the full progress bar text to determine actual width
         # Progress bar format: "Label [====>     ] XX%"
-        # Need: label + space + "[" + bar + "]" + space + "100%" = label_len + 1 + 1 + bar_width + 1 + 1 + 4
         label_len = len(progress_label)
-        # Reserve space for: label + space + brackets (2) + space + "100%" (4) + padding (2)
-        reserved = label_len + 1 + 2 + 1 + 4 + 2
-        max_bar_chars = max(10, inner_width - reserved)
-        bar_width = min(40, max_bar_chars)
+        # Try different bar widths to find one that fits
+        bar_width = min(40, inner_width - label_len - 10)  # Reserve space for label + brackets + % + spacing
+        bar_width = max(10, bar_width)  # Minimum bar width
+        
+        # Build a sample to get exact length
+        sample_bar = "[" + "=" * bar_width + "]"
+        sample_text = f"{progress_label} {sample_bar} 100%"
+        
+        # If it's too long, reduce bar width
+        while len(sample_text) > inner_width and bar_width > 10:
+            bar_width -= 1
+            sample_bar = "[" + "=" * bar_width + "]"
+            sample_text = f"{progress_label} {sample_bar} 100%"
+        
         # Center the entire progress bar text within inner_width
-        estimated_full_len = label_len + 1 + 2 + bar_width + 1 + 1 + 4  # label + space + [ + bar + ] + space + %
-        bar_x = inner_x + (inner_width - estimated_full_len) // 2
+        full_text_len = len(sample_text)
+        bar_x = inner_x + (inner_width - full_text_len) // 2
         # Ensure bar_x doesn't go outside inner area
-        bar_x = max(inner_x, min(bar_x, inner_x + inner_width - estimated_full_len))
+        bar_x = max(inner_x, min(bar_x, inner_x + inner_width - full_text_len))
         _draw_ascii_progress_bar(stdscr, row, bar_x, bar_width, progress, progress_label)
         row += 2
     
