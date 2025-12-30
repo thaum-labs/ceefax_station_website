@@ -83,7 +83,6 @@ def create_app() -> FastAPI:
     app = FastAPI(title="Ceefaxstation Tracker", lifespan=lifespan)
 
     static_dir = Path(__file__).resolve().parent / "static"
-    app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
 
     @app.get("/", response_class=HTMLResponse)
     def index() -> str:
@@ -91,7 +90,12 @@ def create_app() -> FastAPI:
 
     @app.get("/changelog", response_class=HTMLResponse)
     def changelog() -> str:
-        return (static_dir / "changelog.html").read_text(encoding="utf-8")
+        changelog_path = static_dir / "changelog.html"
+        if not changelog_path.exists():
+            raise HTTPException(status_code=404, detail="Changelog page not found")
+        return changelog_path.read_text(encoding="utf-8")
+
+    app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
 
     @app.get("/api/map")
     def api_map(request: Request, range: str = "24h") -> JSONResponse:  # noqa: A002
