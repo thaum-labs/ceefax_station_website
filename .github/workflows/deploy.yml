@@ -56,12 +56,7 @@ jobs:
             echo ""
             echo "=== Replace SM6OPW with TEST1 (one-time) ==="
             cd "${REPO_DIR}"
-            if python3 -c "import sys; sys.path.insert(0, '.'); from ceefaxweb.db import connect, default_db_path; from pathlib import Path; conn = connect(default_db_path(Path('.'))); row = conn.execute('SELECT * FROM stations WHERE callsign = ?', ('SM6OPW',)).fetchone(); conn.close(); sys.exit(0 if row else 1)" 2>/dev/null; then
-              echo "Found SM6OPW, replacing with TEST1..."
-              echo "yes" | python3 -m ceefaxweb.scripts.replace_callsign SM6OPW TEST1 || echo "Replacement completed or failed (check output above)"
-            else
-              echo "SM6OPW not found, skipping replacement"
-            fi
+            echo "yes" | python3 -m ceefaxweb.scripts.replace_callsign SM6OPW TEST1 2>&1 || echo "Replacement check completed (SM6OPW may not exist or already replaced)"
 
             echo ""
             echo "=== Restart ceefaxweb ==="
