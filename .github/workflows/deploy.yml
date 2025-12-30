@@ -54,6 +54,16 @@ jobs:
             git log -1 --oneline
 
             echo ""
+            echo "=== Replace SM6OPW with TEST1 (one-time) ==="
+            cd "${REPO_DIR}"
+            if python3 -c "import sys; sys.path.insert(0, '.'); from ceefaxweb.db import connect, default_db_path; from pathlib import Path; conn = connect(default_db_path(Path('.'))); row = conn.execute('SELECT * FROM stations WHERE callsign = ?', ('SM6OPW',)).fetchone(); conn.close(); sys.exit(0 if row else 1)" 2>/dev/null; then
+              echo "Found SM6OPW, replacing with TEST1..."
+              echo "yes" | python3 -m ceefaxweb.scripts.replace_callsign SM6OPW TEST1 || echo "Replacement completed or failed (check output above)"
+            else
+              echo "SM6OPW not found, skipping replacement"
+            fi
+
+            echo ""
             echo "=== Restart ceefaxweb ==="
             systemctl restart ceefaxweb
             sleep 2
