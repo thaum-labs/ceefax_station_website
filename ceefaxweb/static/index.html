@@ -161,10 +161,8 @@
         }
         #side.expanded {
           transform: translateY(0);
-          overflow-y: auto;
-          -webkit-overflow-scrolling: touch;
-          touch-action: pan-y;
-          overscroll-behavior: contain;
+          /* Expanded panel should not require scrolling on mobile */
+          overflow-y: hidden;
         }
         .sidebar-toggle {
           position: fixed;
@@ -295,8 +293,18 @@
         .footer {
           display: none;
         }
+        /* Hide mobile elements that would require scrolling */
+        #status + .box {
+          /* Hide the large instruction box ("Click a line...") on mobile */
+          display: none;
+        }
+        .legend-note {
+          /* Hide the long legend explanation paragraph */
+          display: none;
+        }
         #detail {
-          margin-top: 6px;
+          /* Link detail table is too tall for mobile without scrolling */
+          display: none !important;
         }
         table {
           font-size: 10px;
@@ -395,7 +403,7 @@
             <div class="legend-item"><span>Receiving OK (all pages)</span><span class="swatch sw-yellow"></span></div>
             <div class="legend-item"><span>Receiving partial (missing pages)</span><span class="swatch sw-blue"></span></div>
           </div>
-          <div class="muted" style="margin-top:8px;">
+          <div class="muted legend-note" style="margin-top:8px;">
             Partial stations render as a diagonal split (top-left = station color, bottom-right = blue).
             Links are yellow when complete and blue when incomplete.
           </div>
