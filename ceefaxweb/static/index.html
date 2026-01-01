@@ -156,16 +156,22 @@
           right: 10px;
           color: #ffd34d;
           font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-          font-size: 10px;
+          /* 50% smaller than before */
+          font-size: 5px;
           font-weight: 800;
           letter-spacing: 0;
           opacity: 0.6;
           z-index: 1000;
           pointer-events: none;
-          text-transform: uppercase;
           white-space: pre;
           line-height: 1.05;
           margin: 0;
+          /* Dot-matrix "screen" pattern behind letters (no solid background) */
+          background-image:
+            radial-gradient(circle, rgba(255, 211, 77, 0.22) 0.6px, rgba(255, 211, 77, 0) 0.7px);
+          background-size: 4px 4px;
+          background-position: 0 0;
+          padding: 2px 2px;
         }
         #side {
           position: fixed;
