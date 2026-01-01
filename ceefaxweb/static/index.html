@@ -16,6 +16,7 @@
       #map { height: 100%; }
       #side { border-left: 1px solid #222; padding: 12px; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; background: #0b0b0b; color: #f3f3f3; overflow: auto; display: flex; flex-direction: column; }
       .row { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
+      .row label { min-width: 90px; }
       select, button, input { padding: 6px 8px; }
       .muted { opacity: 0.75; font-size: 12px; }
       .box { border: 1px solid #333; padding: 8px; border-radius: 6px; margin-top: 10px; background: #111; }
@@ -51,6 +52,12 @@
 
       /* Improve click affordance on map paths */
       .leaflet-interactive { cursor: pointer; }
+      
+      /* Mobile touch improvements */
+      #map {
+        touch-action: pan-x pan-y pinch-zoom;
+        -webkit-touch-callout: none;
+      }
 
       /* Link detail table */
       table { width: 100%; border-collapse: collapse; }
@@ -104,6 +111,80 @@
         font-weight: 700;
         letter-spacing: 0.5px;
         text-transform: uppercase;
+      }
+
+      /* Mobile responsive styles */
+      @media (max-width: 768px) {
+        #app {
+          grid-template-columns: 1fr;
+          grid-template-rows: 50vh auto;
+          height: auto;
+          min-height: 100vh;
+        }
+        #map {
+          height: 50vh;
+          min-height: 300px;
+        }
+        #side {
+          border-left: none;
+          border-top: 1px solid #222;
+          padding: 10px;
+          max-height: none;
+          overflow-y: visible;
+        }
+        .row {
+          flex-wrap: wrap;
+        }
+        .row label {
+          min-width: 80px;
+          width: 100%;
+          margin-bottom: 4px;
+        }
+        select, button {
+          flex: 1;
+          min-width: 120px;
+        }
+        .logo {
+          font-size: 10px;
+          line-height: 1;
+        }
+        .alpha-banner {
+          font-size: 11px;
+          padding: 8px 10px;
+        }
+        table {
+          font-size: 11px;
+        }
+        th, td {
+          padding: 4px;
+          font-size: 11px;
+        }
+      }
+
+      @media (max-width: 480px) {
+        #map {
+          height: 45vh;
+          min-height: 250px;
+        }
+        #side {
+          padding: 8px;
+        }
+        .row label {
+          min-width: 70px;
+          font-size: 14px;
+        }
+        select, button, input {
+          padding: 8px 6px;
+          font-size: 14px;
+        }
+        .logo {
+          font-size: 8px;
+          padding: 4px 6px;
+        }
+        .box {
+          padding: 6px;
+          font-size: 13px;
+        }
       }
 
     </style>
