@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>Ceefaxstation</title>
     <link
       rel="stylesheet"
@@ -11,7 +11,7 @@
       crossorigin=""
     />
     <style>
-      html, body { height: 100%; margin: 0; }
+      html, body { height: 100%; margin: 0; padding: 0; background: #0b0b0b; }
       #app { display: grid; grid-template-columns: 1fr 414px; height: 100%; }
       #map { height: 100%; }
       #side { border-left: 1px solid #222; padding: 12px; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; background: #0b0b0b; color: #f3f3f3; overflow: auto; display: flex; flex-direction: column; }
@@ -115,15 +115,21 @@
 
       /* Mobile responsive styles */
       @media (max-width: 768px) {
+        html, body {
+          background: #0b0b0b;
+          overflow-x: hidden;
+        }
         #app {
           grid-template-columns: 1fr;
           grid-template-rows: 50vh auto;
           height: auto;
           min-height: 100vh;
+          background: #0b0b0b;
         }
         #map {
           height: 50vh;
           min-height: 300px;
+          background: #0b0b0b;
         }
         #side {
           border-left: none;
