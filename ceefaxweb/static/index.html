@@ -147,19 +147,20 @@
           transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
           border-left: none;
           border-top: none;
-          padding: 10px;
+          padding: 6px 8px;
           padding-bottom: 70px;
-          overflow-y: auto;
+          overflow-y: hidden;
           overflow-x: hidden;
           z-index: 1000;
-          -webkit-overflow-scrolling: touch;
-          touch-action: pan-y;
           box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
           border-radius: 20px 20px 0 0;
-          overscroll-behavior: contain;
         }
         #side.expanded {
           transform: translateY(0);
+          overflow-y: auto;
+          -webkit-overflow-scrolling: touch;
+          touch-action: pan-y;
+          overscroll-behavior: contain;
         }
         .sidebar-toggle {
           position: fixed;
@@ -227,55 +228,102 @@
         #side.expanded ~ .sidebar-toggle .sidebar-toggle-text {
           opacity: 0.8;
         }
+        .logo-wrap {
+          display: none;
+        }
+        .alpha-banner {
+          display: none;
+        }
         .row {
-          flex-wrap: wrap;
+          flex-wrap: nowrap;
+          margin-bottom: 6px;
+          gap: 6px;
         }
         .row label {
-          min-width: 80px;
-          width: 100%;
-          margin-bottom: 4px;
+          min-width: 75px;
+          font-size: 13px;
+          margin-bottom: 0;
         }
         select, button {
           flex: 1;
-          min-width: 120px;
+          min-width: 0;
+          padding: 6px 8px;
+          font-size: 13px;
         }
-        .logo {
-          font-size: 10px;
-          line-height: 1;
-        }
-        .alpha-banner {
+        #status {
           font-size: 11px;
-          padding: 8px 10px;
+          margin: 4px 0;
+        }
+        .box {
+          padding: 6px 8px;
+          margin-top: 6px;
+          font-size: 12px;
+        }
+        .box strong {
+          font-size: 12px;
+        }
+        .legend {
+          gap: 4px;
+          margin-top: 4px;
+        }
+        .legend-item {
+          padding: 4px 6px;
+          font-size: 11px;
+        }
+        .legend-item span:first-child {
+          font-size: 11px;
+        }
+        .swatch {
+          width: 32px;
+          height: 16px;
+        }
+        .muted {
+          font-size: 10px;
+          margin-top: 4px;
+        }
+        .footer {
+          display: none;
+        }
+        #detail {
+          margin-top: 6px;
         }
         table {
-          font-size: 11px;
+          font-size: 10px;
         }
         th, td {
-          padding: 4px;
-          font-size: 11px;
+          padding: 3px;
+          font-size: 10px;
         }
       }
 
       @media (max-width: 480px) {
         #side {
-          padding: 8px;
+          padding: 5px 6px;
           padding-bottom: 70px;
         }
+        .row {
+          margin-bottom: 5px;
+          gap: 5px;
+        }
         .row label {
-          min-width: 70px;
-          font-size: 14px;
+          min-width: 65px;
+          font-size: 12px;
         }
         select, button, input {
-          padding: 8px 6px;
-          font-size: 14px;
-        }
-        .logo {
-          font-size: 8px;
-          padding: 4px 6px;
+          padding: 5px 6px;
+          font-size: 12px;
         }
         .box {
-          padding: 6px;
-          font-size: 13px;
+          padding: 5px 6px;
+          margin-top: 5px;
+          font-size: 11px;
+        }
+        .legend-item {
+          padding: 3px 5px;
+          font-size: 10px;
+        }
+        #status {
+          font-size: 10px;
         }
       }
 
