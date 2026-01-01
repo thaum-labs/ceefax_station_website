@@ -3,6 +3,24 @@
   "stage": "alpha",
   "entries": [
     {
+      "date": "2025-12-31",
+      "version": "0.1.0-alpha",
+      "changes": [
+        "Added mobile-responsive design with collapsible bottom sheet panel",
+        "Implemented content-sized mobile panel that adapts to content height (no blank space)",
+        "Added collapsible 'filters & settings' tab at bottom of mobile view",
+        "Panel expands from bottom tab to show all controls without scrolling",
+        "Added 'back to map' close button in expanded panel header",
+        "Positioned grey drag handle above close button for better UX",
+        "Aligned dropdown controls vertically on mobile for consistent layout",
+        "Hidden logo, alpha banner, and footer on mobile to maximize space",
+        "Condensed all mobile controls to fit within viewport without scrolling",
+        "Added safe-area insets support for iOS devices (notch/home indicator)",
+        "Improved touch targets and spacing for mobile interactions",
+        "Styled mobile tab and close button with matching pill design"
+      ]
+    },
+    {
       "date": "2025-12-30",
       "version": "0.1.0-alpha",
       "changes": [
