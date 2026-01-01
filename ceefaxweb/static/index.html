@@ -117,6 +117,9 @@
       .sidebar-toggle {
         display: none;
       }
+      .mobile-map-title {
+        display: none;
+      }
       /* Mobile-only UI elements should be hidden on desktop by default */
       .mobile-link-notification { display: none; }
       .mobile-side-header { display: none; }
@@ -144,6 +147,22 @@
           height: 100dvh;
           width: 100%;
           background: #0b0b0b;
+          position: relative;
+        }
+        .mobile-map-title {
+          display: block;
+          position: absolute;
+          top: calc(env(safe-area-inset-top) + 10px);
+          right: 10px;
+          color: #ffd34d;
+          font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+          font-size: 14px;
+          font-weight: 700;
+          letter-spacing: 1px;
+          opacity: 0.6;
+          z-index: 1000;
+          pointer-events: none;
+          text-transform: uppercase;
         }
         #side {
           position: fixed;
@@ -446,7 +465,9 @@
   </head>
   <body>
     <div id="app">
-      <div id="map"></div>
+      <div id="map">
+        <div class="mobile-map-title">CEEFAX STATION</div>
+      </div>
       <div class="mobile-link-notification" id="mobileLinkNotification">
         Reception table updated — view in panel below
       </div>
