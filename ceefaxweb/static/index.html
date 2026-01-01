@@ -127,7 +127,7 @@
       /* Mobile responsive styles */
       @media (max-width: 768px) {
         :root {
-          --tab-h: calc(70px + env(safe-area-inset-bottom));
+          --tab-h: calc(110px + env(safe-area-inset-bottom));
         }
         html, body {
           background: #0b0b0b;
@@ -346,6 +346,31 @@
         #side.expanded ~ .sidebar-toggle .sidebar-toggle-text {
           opacity: 0.8;
         }
+        .sidebar-toggle-footer {
+          width: 100%;
+          max-width: 520px;
+          margin: 8px auto 0;
+          padding: 0 12px;
+          font-size: 10px;
+          opacity: 0.75;
+          text-align: center;
+          pointer-events: auto;
+          transition: opacity 0.2s ease;
+        }
+        .sidebar-toggle-footer a {
+          color: #ffd34d;
+          text-decoration: underline;
+        }
+        .sidebar-toggle-links {
+          margin-bottom: 4px;
+        }
+        .sidebar-toggle-credit {
+          font-size: 9px;
+          opacity: 0.7;
+        }
+        #side.expanded ~ .sidebar-toggle .sidebar-toggle-footer {
+          display: none;
+        }
         .side-inner {
           width: 100%;
           max-width: 520px;
@@ -443,7 +468,7 @@
 
       @media (max-width: 480px) {
         :root {
-          --tab-h: calc(70px + env(safe-area-inset-bottom));
+          --tab-h: calc(110px + env(safe-area-inset-bottom));
         }
         #side {
           padding: calc(5px + env(safe-area-inset-top)) calc(6px + env(safe-area-inset-right)) 0 calc(6px + env(safe-area-inset-left));
@@ -580,6 +605,12 @@
       </div>
       <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">
         <span class="sidebar-toggle-text">filters &amp; settings</span>
+        <div class="sidebar-toggle-footer">
+          <div class="sidebar-toggle-links">
+            <a href="/about" style="text-decoration:underline;">About</a> · <a href="/changelog" style="text-decoration:underline;">Changelog</a> · <span id="versionDisplayMobile"></span>
+          </div>
+          <div class="sidebar-toggle-credit">Created by <strong>M7TJF</strong> · Ceefax Station © <span id="yearMobile"></span></div>
+        </div>
       </button>
     </div>
 
@@ -1013,10 +1044,16 @@
       connectWS();
 
       // Footer year
-      document.getElementById('year').textContent = String(new Date().getFullYear());
+      const currentYear = String(new Date().getFullYear());
+      document.getElementById('year').textContent = currentYear;
+      const yearMobileEl = document.getElementById('yearMobile');
+      if (yearMobileEl) {
+        yearMobileEl.textContent = currentYear;
+      }
 
       // Load version on page load
       const versionDisplay = document.getElementById('versionDisplay');
+      const versionDisplayMobile = document.getElementById('versionDisplayMobile');
       (async () => {
         try {
           const res = await fetch('/api/version');
@@ -1027,6 +1064,9 @@
                          version.includes('-beta') ? 'beta' : 'release';
             const versionText = `v${version}${stage !== 'release' ? ` (${stage})` : ''}`;
             versionDisplay.textContent = versionText;
+            if (versionDisplayMobile) {
+              versionDisplayMobile.textContent = versionText;
+            }
           }
         } catch (err) {
           console.error('Failed to load version:', err);
