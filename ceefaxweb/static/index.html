@@ -14,7 +14,7 @@
       html, body { height: 100%; margin: 0; padding: 0; background: #0b0b0b; }
       #app { display: grid; grid-template-columns: 1fr 414px; height: 100%; }
       #map { height: 100%; }
-      #side { border-left: 1px solid #222; padding: 12px; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; background: #0b0b0b; color: #f3f3f3; overflow: auto; display: flex; flex-direction: column; }
+      #side { border-left: 1px solid #222; padding: 12px; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; background: #0b0b0b; color: #f3f3f3; display: flex; flex-direction: column; }
       .row { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
       .row label { min-width: 90px; }
       select, button, input { padding: 6px 8px; }
@@ -350,6 +350,11 @@
           width: 100%;
           max-width: 520px;
           margin: 0 auto;
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          overflow-y: auto;
+          min-height: 0;
         }
 
         .logo-wrap {
@@ -565,12 +570,12 @@
             </table>
           </div>
         </div>
+        </div>
 
         <div class="footer">
           <div class="line"><a href="https://github.com/thaum-labs/ceefax_station" target="_blank" rel="noopener noreferrer">Download Ceefax Station</a></div>
           <div class="line"><a href="/about" style="text-decoration:underline;">About</a> · <a href="/changelog" style="text-decoration:underline;">Changelog</a> · <span id="versionDisplay"></span></div>
           <div class="line">Created by <strong>M7TJF</strong> · Ceefax Station © <span id="year"></span></div>
-        </div>
         </div>
       </div>
       <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">
