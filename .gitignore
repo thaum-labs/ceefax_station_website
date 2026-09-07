@@ -137,3 +137,11 @@ screenshots/.tmp*
 # Hub published page packs (runtime)
 ceefaxweb/data/page_pack/
 ceefax/pages/hub_manifest.json
+
+# Local leftovers
+.gh-auth-refresh.*
+test-results/
+playwright-report/
+blob-report/
+qa/.runtime/
+qa/report/

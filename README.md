@@ -7,7 +7,7 @@
 <p align="center">
   <a href="https://www.python.org/"><img src="https://img.shields.io/badge/Python-3.11-3776AB?logo=python&logoColor=white" alt="Python 3.11" /></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="MIT License" /></a>
-  <img src="https://img.shields.io/badge/version-0.1.5--alpha-orange" alt="Version 0.1.5-alpha" />
+  <img src="https://img.shields.io/badge/version-0.1.6--alpha-orange" alt="Version 0.1.6-alpha" />
   <img src="https://img.shields.io/badge/platform-Windows%20%7C%20Linux-0078D6?logo=linux&logoColor=white" alt="Windows and Linux" />
   <br/>
   <img src="https://img.shields.io/badge/AX.25-AFSK1200-0B3D0B" alt="AX.25 AFSK1200" />
@@ -217,6 +217,8 @@ In the interactive viewer, **T** transmits now (3 loops) and then **stays armed*
 
 After a TX or RX session, Ceefax Station **automatically uploads** the new log to [ceefaxstation.com](https://ceefaxstation.com) (needs `callsign` + `grid` in `radio_config.json`).
 
+On the live map, **Time Frame** filters stations last seen in the last 24 hours, 7 days, or 30 days. The view fits those stations so a lone distant grid square stays visible, and stations rebuilt from stored upload logs remain on the map in every window.
+
 You can still run a background watcher if you prefer:
 
 ```bash
@@ -259,6 +261,7 @@ Disable automatic uploads with environment variable `CEEFAX_AUTO_UPLOAD=0`.
 ## Helpful links
 
 - Live map + hub: [ceefaxstation.com](https://ceefaxstation.com)
+- Changelog: [ceefaxstation.com/changelog](https://ceefaxstation.com/changelog)
 - Extra technical notes: [ceefax/README.md](ceefax/README.md)
 - Licence: [MIT](LICENSE)
 
@@ -273,7 +276,7 @@ Disable automatic uploads with environment variable `CEEFAX_AUTO_UPLOAD=0`.
 ceefax/           station app, page updaters, viewer
 ceefaxstation/    CLI (`python -m ceefaxstation ...`)
 ceefaxweb/        official site source (ceefaxstation.com — not for self-hosting)
-installers/       Windows Setup .exe + Linux .deb (current: 0.1.5-alpha / tag v0.1.5)
+installers/       Windows Setup .exe + Linux .deb (last packaged: 0.1.5-alpha / tag v0.1.5)
 packaging/debian/ build notes for the Debian package
 ```
 
